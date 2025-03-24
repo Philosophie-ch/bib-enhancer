@@ -1,5 +1,5 @@
-from bib_enhancer.logic.functions import author_full_name
-from bib_enhancer.logic.models import Author
+from philoch_bib_enhancer.logic.functions import author_full_name
+from philoch_bib_enhancer.logic.models import Author
 
 
 def test_slotted_classes_are_slotted() -> None:

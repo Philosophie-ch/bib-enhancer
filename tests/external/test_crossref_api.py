@@ -1,5 +1,5 @@
 import pytest
-from bib_enhancer.adapters.crossref.crossref_client import CrossrefClient
+from philoch_bib_enhancer.adapters.crossref.crossref_client import CrossrefClient
 
 
 @pytest.mark.external

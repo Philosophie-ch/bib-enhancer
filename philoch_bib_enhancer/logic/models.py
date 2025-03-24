@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import List, Tuple
 import attrs
 
-from bib_enhancer.logic.enums import BibInfoSourceEnum, BibTeXEntryTypeEnum, EpochEnum, LanguageIDEnum
+from philoch_bib_enhancer.logic.enums import BibInfoSourceEnum, BibTeXEntryTypeEnum, EpochEnum, LanguageIDEnum
 
 
 ############

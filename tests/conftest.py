@@ -3,7 +3,7 @@ from typing import Any, List
 
 import pytest
 
-from bib_enhancer.adapters.crossref.crossref_client import CrossrefClient
+from philoch_bib_enhancer.adapters.crossref.crossref_client import CrossrefClient
 from tests.adapters.crossref.example_journals_response import EXAMPLE_JOURNALS_RESPONSE
 
 

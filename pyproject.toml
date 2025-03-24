@@ -1,5 +1,5 @@
 [project]
-name = "bib-enhancer"
+name = "philoch-bib-enhancer"
 version = "0.1.0"
 description = "Scripts to enhance Philosophie.ch's Bibliography"
 authors = [

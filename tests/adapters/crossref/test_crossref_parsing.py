@@ -1,5 +1,5 @@
 from typing import Any, List
-from bib_enhancer.adapters.crossref.crossref_models import CrossrefArticle
+from philoch_bib_enhancer.adapters.crossref.crossref_models import CrossrefArticle
 
 
 def test_crossref_article_model_validation(raw_crossref_articles: List[dict[Any, Any]]) -> None:
