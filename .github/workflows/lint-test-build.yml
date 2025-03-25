@@ -1,0 +1,48 @@
+name: Lint, Type Check, Test, and Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint-type-test-build:
+    name: Lint, Type Check, Test, and Build
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.13'
+
+    - name: Install poetry
+      run: |
+        sudo apt-get update
+        sudo apt-get install python3-dev
+        python3 -m pip install --upgrade pip
+        python3 -m pip install poetry
+
+    - name: Install dependencies
+      run: |
+        poetry env use 3.13
+        poetry install --no-root
+
+    - name: Run black
+      run: poetry run black --check .
+
+    - name: Run mypy
+      run: poetry run mypy --config-file pyproject.toml .
+
+    - name: Run pytest
+      run: poetry run pytest
+      
+    - name: Run build
+      run: poetry build
