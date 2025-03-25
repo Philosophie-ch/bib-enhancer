@@ -1935,6 +1935,22 @@ files = [
 ptyprocess = ">=0.5"
 
 [[package]]
+name = "philoch-bib-sdk"
+version = "0.1.2"
+description = "Standard development kit for the Philosophie Bibliography project"
+optional = false
+python-versions = ">=3.13"
+groups = ["main"]
+files = [
+    {file = "philoch_bib_sdk-0.1.2-py3-none-any.whl", hash = "sha256:64829e279a4ac596ba12ebd9e38b68739f2896043feef1c56bbc8ef39be82fe9"},
+    {file = "philoch_bib_sdk-0.1.2.tar.gz", hash = "sha256:5f409b7e26a3b076194b890d6eb780760ded482fcf596652d35357d41356cf40"},
+]
+
+[package.dependencies]
+aletk = ">=0.1.6,<0.2.0"
+attrs = ">=25.3.0,<26.0.0"
+
+[[package]]
 name = "platformdirs"
 version = "4.3.7"
 description = "A small Python package for determining appropriate platform-specific dirs, e.g. a `user data dir`."
@@ -3184,4 +3200,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.13"
-content-hash = "9956e8c301d94b7895040e03255f646b8ab4075b5acf2f3182fdfdf579d476d9"
+content-hash = "dec2db5ba0aeae61dd7aed66500adb79499441d12ea5513dbb7beea20a6d5be8"
