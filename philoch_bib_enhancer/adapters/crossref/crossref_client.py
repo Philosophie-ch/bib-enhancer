@@ -12,6 +12,12 @@ class CrossrefClient:
         self.logger = logging.getLogger(self.__class__.__name__)
         self._client = self._get_client()
 
+        is_up = self.ping()
+        if not is_up:
+            raise ConnectionError(
+                "Could not connect to Crossref API. Please check your internet connection or the API status."
+            )
+
     @property
     def email(self) -> str:
         return self._email
@@ -31,8 +37,11 @@ class CrossrefClient:
         Check if Crossref is up and running.
         """
         try:
-            self.raw_client.works(query="*", limit=1)
+            res = self.raw_client.works(query="*", limit=1)
+            if not isinstance(res, dict):
+                raise ValueError(f"Unexpected response type from Crossref: {type(res)}. Expected dict.")
             return True
+
         except Exception as e:
             self.logger.error(f"Could not ping Crossref. {e.__class__.__name__}: {e}")
             return False

@@ -1,5 +1,5 @@
 from typing import Dict, List
-from pydantic import BaseModel, HttpUrl, Field
+from pydantic import BaseModel, Field
 
 
 class CrossrefDateTime(BaseModel):
