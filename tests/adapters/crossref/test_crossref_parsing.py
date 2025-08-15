@@ -21,3 +21,4 @@ def test_crossref_article_conversion(raw_crossref_articles: List[dict[Any, Any]]
     for raw_article in raw_articles:
         cr_article = CrossrefArticle(**raw_article)
         bib_item = _convert_crossref_article_to_bibitem(cr_article)
+        assert bib_item is not None, "BibItem conversion failed"
