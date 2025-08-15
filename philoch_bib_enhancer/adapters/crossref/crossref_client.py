@@ -1,4 +1,5 @@
 import logging
+from time import sleep
 from typing import Any
 from habanero import Crossref
 
@@ -71,5 +72,7 @@ class CrossrefClient:
             },
             limit=1000,
         )
+
+        sleep(0.1)
 
         return response
