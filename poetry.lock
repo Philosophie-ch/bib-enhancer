@@ -1963,19 +1963,20 @@ ptyprocess = ">=0.5"
 
 [[package]]
 name = "philoch-bib-sdk"
-version = "0.1.3"
+version = "0.1.4"
 description = "Standard development kit for the Philosophie Bibliography project"
 optional = false
 python-versions = ">=3.13"
 groups = ["main"]
 files = [
-    {file = "philoch_bib_sdk-0.1.3-py3-none-any.whl", hash = "sha256:1c4ffeb6e85a32b63317cdd42a7298de9b290219ec9315ce77ead14ed73c0ec9"},
-    {file = "philoch_bib_sdk-0.1.3.tar.gz", hash = "sha256:238e85b84684edad6c380925e29454a4fcf051133a74d527832191c623ee8c1e"},
+    {file = "philoch_bib_sdk-0.1.4-py3-none-any.whl", hash = "sha256:2477bfec8234696bd4061c689e363f07178f23225c87bf674252267f5515c1f0"},
+    {file = "philoch_bib_sdk-0.1.4.tar.gz", hash = "sha256:b6d79fcd27ea823ae09332668a6426a6fa3a7ae66110fb4f487802a29c88f092"},
 ]
 
 [package.dependencies]
 aletk = ">=0.1.6,<0.2.0"
 attrs = ">=25.3.0,<26.0.0"
+polars = ">=1.32.3,<2.0.0"
 
 [[package]]
 name = "platformdirs"
@@ -3344,4 +3345,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.13"
-content-hash = "7f7a79efaf4d087ef19245fcad478e1376203af8e2a63a53b3b16ba671f03c11"
+content-hash = "e09edcc579f6469a2f3b0419d50db3fa28e9908610785937a81711854fa10f47"
