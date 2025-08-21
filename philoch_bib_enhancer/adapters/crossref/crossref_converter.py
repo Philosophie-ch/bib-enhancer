@@ -9,7 +9,7 @@ from philoch_bib_sdk.logic.default_models import (
 )
 
 from philoch_bib_enhancer.adapters.crossref.crossref_models import CrossrefArticle, ParsedResult
-from philoch_bib_enhancer.sdk.default_models import BibItemArgs, BibItemDateArgs, PageArgs, default_bib_item
+from philoch_bib_sdk.logic.default_models import BibItemArgs, BibItemDateArgs, PageArgs, default_bib_item
 
 
 def _convert_raw_crossref_response_to_crossref_article(raw_object: Dict[Any, Any]) -> CrossrefArticle:
