@@ -10,7 +10,7 @@ from aletk.ResultMonad import main_try_except_wrapper
 from aletk.utils import get_logger
 
 from philoch_bib_enhancer.adapters.crossref.crossref_client import CrossrefClient
-from philoch_bib_enhancer.adapters.crossref.crossref_models import ParsedResult, ParsingSuccess
+from philoch_bib_enhancer.adapters.crossref.crossref_models import ParsedResult
 from philoch_bib_enhancer.adapters.crossref import crossref_bibitem_gateway
 
 lgr = get_logger(__file__)
