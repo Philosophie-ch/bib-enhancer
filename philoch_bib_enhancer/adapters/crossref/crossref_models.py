@@ -1,5 +1,4 @@
-from typing import Dict, List, TypeGuard, TypedDict
-from typing_extensions import Literal
+from typing import Dict, List
 from pydantic import BaseModel, Field
 
 
@@ -59,29 +58,3 @@ class CrossrefArticle(BaseModel):
     ISSN: List[str] = []
     issn_type: List[CrossrefISSNType] = Field([], alias="issn-type")
     published: CrossrefDateParts | None = None
-
-
-class ParsingSuccess[T](TypedDict, total=True):
-    """
-    A parsed object with a result and a parsing status.
-    """
-
-    out: T
-    parsing_status: Literal["success"]
-
-
-class ParsingError(TypedDict, total=True):
-    """
-    An error that occurred during parsing.
-    """
-
-    parsing_status: Literal["error"]
-    message: str
-    context: str
-
-
-type ParsedResult[T] = ParsingSuccess[T] | ParsingError
-
-
-def is_parsing_success[T](result: ParsedResult[T]) -> TypeGuard[ParsingSuccess[T]]:
-    return result.get("parsing_status") == "success"

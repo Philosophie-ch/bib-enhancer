@@ -12,7 +12,7 @@ from philoch_bib_sdk.logic.functions.journal_article_matcher import (
 )
 from philoch_bib_sdk.logic.models import BibItem
 
-from philoch_bib_enhancer.adapters.crossref.crossref_models import ParsedResult, is_parsing_success
+from philoch_bib_enhancer.domain.parsing_result import ParsedResult, is_parsing_success
 
 
 def match_bibkey_to_article(

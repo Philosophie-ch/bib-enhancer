@@ -15,7 +15,7 @@ from aletk.utils import get_logger, remove_extra_whitespace
 
 from philoch_bib_sdk.logic.models import BibItem
 from philoch_bib_sdk.adapters.tabular_data.read_journal_volume_number_index import ColumnNames
-from philoch_bib_enhancer.adapters.crossref.crossref_models import ParsedResult
+from philoch_bib_enhancer.domain.parsing_result import ParsedResult
 
 lgr = get_logger(__file__)
 
