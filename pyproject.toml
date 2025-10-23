@@ -26,6 +26,7 @@ habanero = "^2.2.0"
 libgen-api = "^1.0.1"
 tenacity = "^9.0.0"
 requests = "^2.32.3"
+fastexcel = "^0.14.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.5"
