@@ -21,9 +21,9 @@ from philoch_bib_sdk.converters.plaintext.bibitem.formatter import format_bibite
 from philoch_bib_sdk.adapters.tabular_data.read_journal_volume_number_index import ColumnNames, hof_read_from_ods
 
 from philoch_bib_enhancer.adapters.crossref.crossref_client import CrossrefClient
-from philoch_bib_enhancer.adapters.crossref.crossref_models import ParsedResult
 from philoch_bib_enhancer.adapters.crossref import crossref_bibitem_gateway
 from philoch_bib_enhancer.domain.bibkey_matching import match_bibkey_to_article
+from philoch_bib_enhancer.domain.parsing_result import ParsedResult
 from philoch_bib_enhancer.ports.journal_scraping import (
     main,
     JournalScraperMainIN,
