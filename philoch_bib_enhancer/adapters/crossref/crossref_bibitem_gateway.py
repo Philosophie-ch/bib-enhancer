@@ -6,8 +6,8 @@ from typing import NamedTuple
 
 from philoch_bib_enhancer.adapters.crossref.crossref_client import CrossrefClient
 from philoch_bib_enhancer.adapters.crossref.crossref_converter import convert_crossref_response_to_bibitem
-from philoch_bib_enhancer.procedures.bibitem_by_doi import TBibItemByDoiOUT
-from philoch_bib_enhancer.procedures.journal_scraping import JournalScraperIN, TJournalScraperOUT
+from philoch_bib_enhancer.ports.bibitem_by_doi import TBibItemByDoiOUT
+from philoch_bib_enhancer.ports.journal_scraping import JournalScraperIN, TJournalScraperOUT
 
 
 class CrossrefGatewayConfig(NamedTuple):

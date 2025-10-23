@@ -78,3 +78,4 @@ extend-exclude = '''
 
 [tool.poetry.scripts]
 format = "scripts.format:main"
+cr-scrape-journal = "philoch_bib_enhancer.cli.crossref_journal_scraping_cli:cli"
