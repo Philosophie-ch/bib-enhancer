@@ -16,7 +16,7 @@ def _convert_raw_crossref_response_to_crossref_article(raw_object: Dict[Any, Any
     """
     Convert a raw Crossref response object to a CrossrefArticle model.
 
-    :param raw_objet: The raw response object from Crossref.
+    :param raw_object: The raw response object from Crossref.
     :return: An instance of CrossrefArticle.
     """
     return CrossrefArticle(**raw_object)

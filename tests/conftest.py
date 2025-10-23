@@ -1,3 +1,4 @@
+import ast
 import os
 from typing import Any, List, Tuple
 
@@ -45,5 +46,5 @@ def raw_crossref_articles() -> List[dict[Any, Any]]:
 @pytest.fixture
 def raw_crossref_article() -> Tuple[List[str], Any]:
     correct_title = ['ÊTRE ET PENSÉE']
-    raw = eval(EXAMPLE_ARTICLE_RESPONSE)
+    raw = ast.literal_eval(EXAMPLE_ARTICLE_RESPONSE)
     return correct_title, raw
