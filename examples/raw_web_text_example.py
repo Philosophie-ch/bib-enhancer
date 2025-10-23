@@ -26,7 +26,7 @@ from philoch_bib_enhancer.adapters.raw_web_text import (
 from philoch_bib_enhancer.domain.parsing_result import is_parsing_success
 
 
-def example_with_claude():
+def example_with_claude() -> None:
     """Example using Claude/Anthropic LLM service."""
     from philoch_bib_enhancer.adapters.llm.claude_llm_service import ClaudeLLMService
 
@@ -61,7 +61,7 @@ def example_with_claude():
         print(f"Context: {result['context'][:200]}...")
 
 
-def example_with_openai():
+def example_with_openai() -> None:
     """Example using OpenAI LLM service."""
     from philoch_bib_enhancer.adapters.llm.openai_llm_service import OpenAILLMService
 
@@ -96,7 +96,7 @@ def example_with_openai():
         print(f"Context: {result['context'][:200]}...")
 
 
-def example_batch_processing():
+def example_batch_processing() -> None:
     """Example of batch processing multiple URLs."""
     from philoch_bib_enhancer.adapters.llm.claude_llm_service import ClaudeLLMService
 

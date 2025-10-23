@@ -57,7 +57,10 @@ env = [
 
 [[tool.mypy.overrides]]
 module = [
-    "habanero"
+    "habanero",
+    "anthropic",
+    "openai",
+    "requests",
 ]
 ignore_missing_imports = true
 

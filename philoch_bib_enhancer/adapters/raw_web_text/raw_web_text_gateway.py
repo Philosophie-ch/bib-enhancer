@@ -11,7 +11,7 @@ from functools import partial
 import inspect
 import sys
 from types import SimpleNamespace
-from typing import NamedTuple, Protocol
+from typing import NamedTuple, Generator
 
 from philoch_bib_enhancer.adapters.raw_web_text.raw_web_text_models import RawWebTextBibitem
 from philoch_bib_enhancer.adapters.raw_web_text.raw_web_text_converter import convert_raw_web_text_to_bibitem
@@ -114,6 +114,27 @@ def get_bibitem_from_url(
             "message": f"Unexpected error in get_bibitem_from_url: {e}",
             "context": url,
         }
+
+
+def get_bibitems_from_urls(
+    config: RawWebTextGatewayConfig,
+    urls: list[str],
+) -> Generator[ParsedResult[BibItem], None, None]:
+    """
+    Extract bibliographic data from multiple URLs and convert to BibItems.
+
+    This is a generator function for lazy evaluation - processes one URL at a time
+    and yields results as they become available.
+
+    Args:
+        config: Gateway configuration with LLM service
+        urls: List of URLs to scrape
+
+    Yields:
+        ParsedResult[BibItem] for each URL (either success or error)
+    """
+    for url in urls:
+        yield get_bibitem_from_url(config, url)
 
 
 # --- Auto-configure ---

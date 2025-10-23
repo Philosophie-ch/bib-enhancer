@@ -2,7 +2,7 @@
 Converter from RawWebTextBibitem (LLM-extracted data) to BibItem.
 """
 
-from typing import Any, Dict, Tuple
+from typing import Tuple, Literal
 from philoch_bib_sdk.logic.models import BibItem
 from philoch_bib_sdk.logic.default_models import (
     AuthorArgs,
@@ -59,7 +59,7 @@ def _convert_raw_web_text_bibitem_to_bibitem(raw_bibitem: RawWebTextBibitem) -> 
     title: BibStringArgs = {"latex": raw_bibitem.title}
 
     # Date
-    date_parts: BibItemDateArgs | str = "no date"
+    date_parts: BibItemDateArgs | Literal["no date"] = "no date"
     if raw_bibitem.year:
         date_parts = {"year": raw_bibitem.year}
 
