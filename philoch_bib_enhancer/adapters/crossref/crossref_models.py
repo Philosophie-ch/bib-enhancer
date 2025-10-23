@@ -1,4 +1,4 @@
-from typing import Dict, List, TypedDict
+from typing import Dict, List, TypeGuard, TypedDict
 from typing_extensions import Literal
 from pydantic import BaseModel, Field
 
@@ -81,3 +81,7 @@ class ParsingError(TypedDict, total=True):
 
 
 type ParsedResult[T] = ParsingSuccess[T] | ParsingError
+
+
+def is_parsing_success[T](result: ParsedResult[T]) -> TypeGuard[ParsingSuccess[T]]:
+    return result.get("parsing_status") == "success"

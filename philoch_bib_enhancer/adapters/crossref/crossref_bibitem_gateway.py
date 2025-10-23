@@ -6,6 +6,7 @@ from typing import NamedTuple
 
 from philoch_bib_enhancer.adapters.crossref.crossref_client import CrossrefClient
 from philoch_bib_enhancer.adapters.crossref.crossref_converter import convert_crossref_response_to_bibitem
+from philoch_bib_enhancer.procedures.bibitem_by_doi import TBibItemByDoiOUT
 from philoch_bib_enhancer.procedures.journal_scraping import JournalScraperIN, TJournalScraperOUT
 
 
@@ -46,6 +47,28 @@ def get_journal_articles(
     cr_articles = (convert_crossref_response_to_bibitem(raw_article) for raw_article in cr_raw)
 
     return cr_articles
+
+
+def get_bibitem_by_doi(
+    config: CrossrefGatewayConfig,
+    doi: str,
+) -> TBibItemByDoiOUT:
+    """
+    Get a BibItem by its DOI using the Crossref API.
+
+    :param config: Configuration for the Crossref BibItem Gateway.
+    :param doi: The DOI of the article to retrieve.
+    :return: A dictionary containing the BibItem and parsing status.
+    """
+    cr = config.client
+    raw_article = cr.raw_client.works(ids=doi)
+
+    if 'message' not in raw_article:
+        raise ValueError(f"Could not find article with DOI {doi}. Response: {raw_article}")
+
+    bibitem_result = convert_crossref_response_to_bibitem(raw_article['message'])
+
+    return bibitem_result
 
 
 # --- Auto-configure ---
