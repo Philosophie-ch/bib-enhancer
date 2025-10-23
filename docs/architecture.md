@@ -362,20 +362,30 @@ Defined in `pyproject.toml`:
 
 ```toml
 [tool.poetry.scripts]
-scrape-journal = "philoch_bib_enhancer.cli.crossref_journal_scraping_cli:cli"
+scrape-journal = "philoch_bib_enhancer.cli.scrape_journal_cli:cli"
 ```
 
 **Usage**:
 ```bash
-# After installation
+# After installation - uses default gateway (from .env)
 scrape-journal --issn "0012-2017" --start-year 2020 --end-year 2024
 
+# Explicitly specify gateway
+scrape-journal --gateway crossref --issn "0012-2017" --start-year 2020 --end-year 2024
+
+# Short form
+scrape-journal -g crossref -i "0012-2017" -s 2020 -e 2024
+
+# With bibkey matching
+scrape-journal -g crossref -i "0012-2017" -s 2020 -e 2024 \
+  --bibliography-path "path/to/biblio.ods"
+
 # During development
-python -m philoch_bib_enhancer.cli.crossref_journal_scraping_cli \
+python -m philoch_bib_enhancer.cli.scrape_journal_cli \
+  --gateway crossref \
   --issn "0012-2017" \
   --start-year 2020 \
-  --end-year 2024 \
-  --bibliography-path "path/to/biblio.ods"
+  --end-year 2024
 ```
 
 ---
@@ -385,10 +395,22 @@ python -m philoch_bib_enhancer.cli.crossref_journal_scraping_cli \
 Required environment variables (loaded from `.env` file):
 
 ```bash
+# Crossref API configuration
 CROSSREF_EMAIL=your.email@example.com
+
+# Default gateway for journal scraping CLI
+SCRAPE_JOURNAL_DEFAULT_GATEWAY=crossref
+
+# Output directory for scraped data
+SCRAPE_JOURNAL_OUTPUT_DIR=data/
 ```
 
 The CLI automatically loads `.env` from the project root using `python-dotenv`.
+
+**Gateway Selection Priority**:
+1. `--gateway` CLI argument (highest priority)
+2. `SCRAPE_JOURNAL_DEFAULT_GATEWAY` environment variable
+3. Fallback: `crossref` (hardcoded default)
 
 ---
 
