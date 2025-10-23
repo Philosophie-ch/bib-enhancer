@@ -295,12 +295,20 @@ def cli() -> None:
             column_names=bibkey_matching_config.column_names,
         )
 
+    # === SETUP OUTPUT DIRECTORY ===
+    output_dir = os.getenv("SCRAPE_JOURNAL_OUTPUT_DIR", ".")
+    # Ensure output directory exists
+    if output_dir != ".":
+        os.makedirs(output_dir, exist_ok=True)
+        lgr.info(f"Output directory: {output_dir}")
+
     # === WIRE DEPENDENCIES AND CALL ORCHESTRATOR ===
     main_in = JournalScraperMainIN(
         journal_scraper_in=journal_scraper_in,
         get_journal_articles=cr_gtw.get_journal_articles,
         match_bibkey=bibkey_matcher,
         write_articles=write_articles_to_csv,
+        output_dir=output_dir,
     )
 
     main(main_in)

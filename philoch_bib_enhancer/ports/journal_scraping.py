@@ -109,6 +109,7 @@ class JournalScraperMainIN(BaseModel):
     get_journal_articles: TJournalScraperFunction
     match_bibkey: TBibkeyMatcher | None = None
     write_articles: TArticleWriter
+    output_dir: str = "."
 
     class Config:
         arbitrary_types_allowed = True
@@ -152,7 +153,10 @@ def main(main_in: JournalScraperMainIN) -> None:
         lgr.info("Bibkey matching completed.")
 
     # Step 3: Write results (delegated to injected function)
-    output_path = f"{journal_scraper_in.issn}_articles.csv"
+    import os
+
+    output_filename = f"{journal_scraper_in.issn}_articles.csv"
+    output_path = os.path.join(main_in.output_dir, output_filename)
     lgr.info(f"Writing articles to {output_path}...")
     write_articles(articles, output_path)
 
