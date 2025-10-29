@@ -23,7 +23,7 @@ T = TypeVar('T', bound=BaseModel)
 
 
 # Define proper Pydantic models for OpenAI's response structure
-# (since they're too lazy to type their own API responses)
+# OpenAI's API responses are not fully typed, so we define our own models
 
 
 class OpenAIMessage(BaseModel):

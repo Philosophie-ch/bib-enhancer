@@ -194,7 +194,7 @@ raw_bibitems = []
 for item in all_items:
     bibitem = RawWebTextBibitem(
         raw_text=item['raw_text'],
-        type='thesis',
+        type='phdthesis',
         title=item['title'],
         year=item['year'],
         authors=item['authors'],

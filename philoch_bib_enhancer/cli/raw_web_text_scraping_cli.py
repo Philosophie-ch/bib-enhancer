@@ -169,7 +169,7 @@ def parse_args() -> argparse.Namespace:
         "-cn",
         type=str,
         default="number",
-        help="The name of the column containing the number in the tabular bibliography file.",
+        help="The name of the column containing the issue number (not the volume number) in the tabular bibliography file.",
     )
 
     parser.add_argument(

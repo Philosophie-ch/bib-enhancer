@@ -45,10 +45,14 @@ def fetch_url_text(url: str, timeout: int = 30) -> str:
         # Get text
         text = soup.get_text(separator='\n', strip=True)
 
-        if not text:
+        # Further clean up excessive whitespace from each line
+        lines = [line.strip() for line in text.split('\n')]
+        cleaned_text = '\n'.join(line for line in lines if line)
+
+        if not cleaned_text:
             raise WebScraperError(f"No text content found at {url}")
 
-        return text
+        return cleaned_text
 
     except requests.RequestException as e:
         raise WebScraperError(f"Failed to fetch URL {url}: {e}") from e
