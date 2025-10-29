@@ -1,0 +1,281 @@
+{
+  "https://www.unifr.ch/philosophie/de/forschung/habilitationen.html": {
+    "site_name": "UniFR Philosophy - Habilitationen",
+    "description": "Habilitation theses from University of Fribourg Philosophy Department",
+    "expected_count": 24,
+    "last_extraction": "2025-10-29",
+    "site_characteristics": {
+      "type": "static_html",
+      "structure": "Simple HTML page with structured thesis listings",
+      "javascript_required": false,
+      "pagination": false
+    },
+    "extraction_method": {
+      "approach": "Direct HTML parsing with fetch_url_text()",
+      "steps": [
+        "Fetch page content using fetch_url_text() from web_scraper",
+        "Parse HTML to identify thesis entries (organized by category: Antike Philosophie, Philosophie des Mittelalters, etc.)",
+        "Each entry contains: Author name, Year, Thesis title, Committee members",
+        "Extract year from text following author name (format: 'Name, Year')",
+        "Create RawWebTextBibitem with type='thesis'"
+      ],
+      "challenges": [],
+      "notes": "Straightforward static page. Years and titles are clearly structured."
+    },
+    "output_format": {
+      "file": "habilitationen_unifr.csv",
+      "location": "./data/test-2/"
+    },
+    "sample_entry": {
+      "raw_text": "Luca Pitteloud, 2021\nOrdre et désordre dans l'univers. Une étude sur l'expérience de pensée du Timée.\nProf. Filip Karfík (Fribourg), Prof. Dimitri El Murr (École normale supérieure, Paris), Prof. Franco Ferrari (Università di Pavia)",
+      "type": "thesis",
+      "title": "Ordre et désordre dans l'univers. Une étude sur l'expérience de pensée du Timée",
+      "year": 2021,
+      "authors": [{"given": "Luca", "family": "Pitteloud"}]
+    }
+  },
+
+  "https://www.fr.ch/bcu/app/master_cat": {
+    "site_name": "Fribourg University Master Catalogue",
+    "description": "Central catalogue for theses, mémoires, and master works from University of Fribourg",
+    "url_parameters": {
+      "f_faculty": "2 = Faculty of Letters",
+      "f_document": "1 = Doctoral theses (Thèses)",
+      "f_subject_category": "40 = Philosophie"
+    },
+    "expected_count": 466,
+    "last_extraction": "2025-10-29",
+    "site_characteristics": {
+      "type": "dynamic_api",
+      "structure": "Drupal-based site with AJAX-loaded results",
+      "javascript_required": true,
+      "pagination": true,
+      "items_per_page": 10
+    },
+    "extraction_method": {
+      "approach": "POST to API endpoint with form parameters",
+      "api_endpoint": "https://www.fr.ch/app/master_cat/get_results",
+      "http_method": "POST",
+      "parameters": {
+        "form[f_faculty]": "2",
+        "form[f_document]": "1",
+        "form[f_subject_category]": "40",
+        "page": "1"
+      },
+      "steps": [
+        "Send POST request to /app/master_cat/get_results",
+        "Use form[parameter] format (NOT URL query parameters)",
+        "Server returns JSON with 'html' and 'pager' keys",
+        "Parse HTML to extract list items (<li class='element-list'>)",
+        "Extract: item ID (hidden input), title (h2), author (p.list__item__description), classification, year",
+        "Paginate through all pages (~47 pages for 466 items)",
+        "Create RawWebTextBibitem objects for each entry"
+      ],
+      "challenges": [
+        {
+          "issue": "URL parameters ignored",
+          "description": "Initially tried GET with f_faculty=2&f_document=1&f_subject_category=40 in URL. API returned all 31,882 unfiltered results.",
+          "solution": "Must use POST with form[parameter] format. Server filters results server-side when form data is correct."
+        },
+        {
+          "issue": "Confusing result count",
+          "description": "Browser showed '466 résultats trouvés' but API returned 31,882 results with GET requests.",
+          "solution": "Browser's JavaScript sends POST with form parameters. GET parameters don't work for filtering."
+        },
+        {
+          "issue": "Attempted detail page fetching",
+          "description": "Initially thought we needed to fetch each item's detail page to check Sujets (subjects) field for 'Philosophie'.",
+          "solution": "Unnecessary when using correct POST parameters. Server pre-filters results."
+        }
+      ],
+      "notes": [
+        "The Drupal site loads results via AJAX using DataTables-style requests",
+        "Form parameter format is critical: 'form[f_subject_category]' not 'f_subject_category'",
+        "Server-side filtering works perfectly when parameters are correct",
+        "Extraction completes in ~2 minutes (47 pages × 0.2s delay = 9.4s + processing)"
+      ]
+    },
+    "discovery_process": {
+      "attempts": [
+        "1. GET with URL parameters → 31,882 unfiltered results",
+        "2. Fetching detail pages one-by-one to check Sujets field → Too slow (hours), only found 43/466 in first 100 pages",
+        "3. Analyzed browser JavaScript → Found DataTables with form parameter format",
+        "4. POST with form[parameter] format → SUCCESS! Got exactly 466 filtered results"
+      ],
+      "key_insight": "Browser shows correct count because JavaScript converts filter selections to POST form data. API ignores GET parameters entirely."
+    },
+    "output_format": {
+      "file": "philosophy_theses_466.csv",
+      "location": "./data/test-2/"
+    },
+    "sample_entry": {
+      "raw_text": "\"Das Eine, was der Menschheit Noth ist\" : Einheit und Freiheit in der Philosophie Karl Leonhard Reinholds (1789-1792) / Alessandro Lazzari\nLazzari, Alessandro\nLieu, Année : Stuttgart-Bad Cannstatt : Frommann-Holzboog, 2004\nPhilosophie\nTHFR FACLET 2000",
+      "type": "thesis",
+      "title": "\"Das Eine, was der Menschheit Noth ist\" : Einheit und Freiheit in der Philosophie Karl Leonhard Reinholds (1789-1792)",
+      "year": 2000,
+      "authors": [{"given": "Alessandro", "family": "Lazzari"}],
+      "publisher": "Frommann-Holzboog"
+    },
+    "related_queries": {
+      "memoires_licence": {
+        "description": "License memoirs in Philosophy",
+        "form[f_document]": "2",
+        "expected_count": 587
+      },
+      "travaux_master": {
+        "description": "Master's theses in Philosophy",
+        "form[f_document]": "3",
+        "expected_count": 61
+      }
+    }
+  },
+
+  "https://www.unil.ch/philo/fr/home/menuinst/recherches/memoires.html": {
+    "site_name": "UNIL Philosophy - Mémoires",
+    "description": "Master's memoirs from University of Lausanne (UNIL) Philosophy Section",
+    "expected_count": "19 (2024 only, ~300+ total across all years 2010-2024)",
+    "last_extraction": "2025-10-29",
+    "site_characteristics": {
+      "type": "static_html",
+      "structure": "Simple HTML page with year-organized memoir listings",
+      "javascript_required": false,
+      "pagination": false,
+      "years_available": "2010-2024"
+    },
+    "extraction_method": {
+      "approach": "Direct HTML parsing with fetch_url_text()",
+      "steps": [
+        "Fetch page content using fetch_url_text() from web_scraper",
+        "Parse HTML to identify memoir entries organized by year (2024, 2023, 2022, etc.)",
+        "Each entry contains: Author name, Title, Month/Year, Director name",
+        "Format: 'LASTNAME Firstname : Title. Month Year\\nDirecteur/Directrice : Director Name'",
+        "Extract year from date line (format: 'Janvier 2024', 'Juin 2024', etc.)",
+        "Extract supervisor from 'Directeur' or 'Directrice' line",
+        "Create RawWebTextBibitem with type='mastersthesis'"
+      ],
+      "challenges": [],
+      "notes": [
+        "Straightforward static page with clear structure",
+        "Years and titles are clearly formatted",
+        "Author names in UPPERCASE LASTNAME, Firstname format",
+        "Privacy notice: 'À partir de 2021, conformément à la loi sur la protection des données personnelles, seul les mémorant-e-s qui ont donné leur consentement express figurent sur cette page'",
+        "This means post-2021 listings are incomplete (only students who gave consent)",
+        "Pre-2021 years likely have more complete listings"
+      ]
+    },
+    "output_format": {
+      "file": "unil_memoires_2024.csv",
+      "location": "./data/test-1/"
+    },
+    "sample_entry": {
+      "raw_text": "RIZET Océane: Objective Idealism\nJuin 2024\nDirecteur : Esfeld Michael",
+      "type": "mastersthesis",
+      "title": "Objective Idealism",
+      "year": 2024,
+      "authors": [{"given": "Océane", "family": "RIZET"}]
+    },
+    "data_quality": {
+      "completeness": "Partial for 2021-2024 (consent-based), likely complete for 2010-2020",
+      "structured_fields": ["author", "title", "year", "month", "supervisor"],
+      "missing_fields": ["publisher", "doi", "url", "pages"],
+      "privacy_constraint": "GDPR compliance - only consenting students listed post-2021"
+    },
+    "future_extractions": {
+      "recommendation": "Extract all years (2010-2024) for complete dataset",
+      "estimated_total": "300-400 mémoires across all years",
+      "script_location": "philoch_bib_enhancer/adapters/raw_web_text/extractors/unil_memoires.py (currently only 2024)"
+    }
+  },
+
+  "https://folia.unifr.ch/unifr/search/documents?customField2=Département%20de%20Philosophie": {
+    "site_name": "FOLIA - University of Fribourg Philosophy Department Publications",
+    "description": "Scholarly publications (articles, books, chapters) from University of Fribourg Philosophy Department via institutional repository",
+    "expected_count": 83,
+    "last_extraction": "2025-10-29",
+    "site_characteristics": {
+      "type": "javascript_spa",
+      "structure": "Angular single-page application (SPA) using Invenio/SONAR framework",
+      "javascript_required": true,
+      "pagination": true,
+      "items_per_page": 10,
+      "api_available": false,
+      "metadata_format": "JSON-LD + Dublin Core"
+    },
+    "extraction_method": {
+      "approach": "Browser-assisted HTML download + individual record fetching",
+      "steps": [
+        "Download fully-rendered page from browser with size=83 parameter to get all results on one page",
+        "Parse HTML to extract document URLs (pattern: /unifr/documents/[0-9]+)",
+        "For each document URL, fetch individual record page via HTTP request",
+        "Extract metadata from structured sources (JSON-LD schema.org + Dublin Core meta tags)",
+        "JSON-LD provides: title, authors (name array), year (datePublished)",
+        "Dublin Core meta tags provide: citation_author, citation_doi, citation_journal_title, citation_volume, citation_issue, citation_firstpage, citation_lastpage, citation_publisher",
+        "Create RawWebTextBibitem objects with all extracted fields",
+        "Process to CSV using process_raw_bibitems()"
+      ],
+      "challenges": [
+        {
+          "issue": "JavaScript-rendered content",
+          "description": "Initial HTML contains only Angular app shell (<sonar-root>). Document list is loaded dynamically via JavaScript.",
+          "solution": "User downloads fully-rendered page from browser after JavaScript execution. URL parameter size=83 ensures all results on one page."
+        },
+        {
+          "issue": "No public API endpoint",
+          "description": "Tried /api/documents, /api/unifr/documents, /unifr/api/documents - all returned 401 or 404.",
+          "solution": "Extract document links from rendered HTML, then fetch each individual record page which contains rich metadata."
+        },
+        {
+          "issue": "Initial extraction missing metadata",
+          "description": "First version only extracted title and year from individual pages.",
+          "solution": "Discovered JSON-LD and Dublin Core meta tags on individual record pages provide complete bibliographic metadata (authors, DOI, journal, volume, pages)."
+        }
+      ],
+      "notes": [
+        "FOLIA uses Invenio digital repository framework from CERN",
+        "Individual record pages have excellent structured metadata",
+        "JSON-LD schema.org markup is most reliable source",
+        "Dublin Core citation meta tags provide journal-specific fields",
+        "1-second delay between requests to be polite to server",
+        "Full extraction takes ~2 minutes for 83 records"
+      ]
+    },
+    "discovery_process": {
+      "attempts": [
+        "1. Direct HTTP request to search URL → Only Angular shell, no content",
+        "2. Tried various API endpoints (/api/documents, etc.) → 401 or 404 errors",
+        "3. Attempted pagination through multiple pages → Still no content (JavaScript required)",
+        "4. User downloads rendered HTML with size=83 → SUCCESS! All 83 document links extracted",
+        "5. Fetch individual record pages → Rich metadata in JSON-LD + Dublin Core"
+      ],
+      "key_insight": "Invenio/SONAR uses Angular SPA requiring JavaScript rendering. Individual record pages have excellent structured metadata for automated extraction."
+    },
+    "output_format": {
+      "file": "folia_unifr_references.csv",
+      "location": "./data/test-2/"
+    },
+    "sample_entry": {
+      "raw_text": "Primitive colours in a physical world\nMoran, Alex\nSynthese 205\n2025",
+      "type": "article",
+      "title": "Primitive colours in a physical world",
+      "year": 2025,
+      "authors": [{"given": "Alex", "family": "Moran"}],
+      "journal": "Synthese",
+      "number": "205",
+      "doi": "10.1007/s11229-025-05026-2",
+      "url": "https://folia.unifr.ch/unifr/documents/331874"
+    },
+    "data_quality": {
+      "completeness": "Excellent - institutional repository with curated metadata",
+      "structured_fields": ["author", "title", "year", "journal", "volume", "issue", "pages", "doi", "publisher"],
+      "coverage": {
+        "authors": "83/83 (100%)",
+        "doi": "46/83 (55%)",
+        "journal": "73/83 (88%)",
+        "years": "83/83 (100%)"
+      },
+      "metadata_source": "JSON-LD schema.org + Dublin Core citation meta tags",
+      "year_range": "2000-2025"
+    },
+    "script_location": "philoch_bib_enhancer/adapters/raw_web_text/extractors/folia_unifr_philosophy.py"
+  }
+}
