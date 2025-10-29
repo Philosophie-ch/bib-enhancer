@@ -83,7 +83,7 @@ def _convert_raw_web_text_bibitem_to_bibitem(raw_bibitem: RawWebTextBibitem) -> 
         )
 
     # Publisher
-    publisher: BibStringArgs = {"latex": raw_bibitem.publisher} if raw_bibitem.publisher else {}
+    publisher: BibStringArgs = {"latex": raw_bibitem.publisher} if raw_bibitem.publisher else {"latex": ""}
 
     # Build BibItem
     bibitem_data: BibItemArgs = {

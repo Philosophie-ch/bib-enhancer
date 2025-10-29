@@ -49,9 +49,9 @@ def is_parsing_success[T](result: ParsedResult[T]) -> TypeGuard[ParsingSuccess[T
     Usage:
         result = convert_something(...)
         if is_parsing_success(result):
-            bibitem = result["out"]  # TypeScript knows this is safe
+            bibitem = result["out"]  # Python's type checker knows this is safe
         else:
-            print(result["message"])  # TypeScript knows this is an error
+            print(result["message"])  # Python's type checker knows this is an error
 
     Args:
         result: A ParsedResult to check
