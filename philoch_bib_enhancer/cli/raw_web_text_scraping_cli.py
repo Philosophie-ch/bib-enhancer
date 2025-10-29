@@ -10,17 +10,13 @@ Specifically implements web text scraping using LLM services (Claude or OpenAI).
 
 import os
 import argparse
-from typing import Iterable
 from dotenv import load_dotenv
 
 from aletk.utils import get_logger, lginf, remove_extra_whitespace
 from pydantic import BaseModel
-from philoch_bib_sdk.logic.models import BibItem
 from philoch_bib_sdk.adapters.tabular_data.read_journal_volume_number_index import ColumnNames
 
 from philoch_bib_enhancer.adapters.raw_web_text import raw_web_text_gateway
-from philoch_bib_enhancer.domain.bibkey_matching import match_bibkey_to_article
-from philoch_bib_enhancer.domain.parsing_result import ParsedResult
 from philoch_bib_enhancer.ports.llm_service import LLMService
 
 # Reuse CSV writer from Crossref CLI

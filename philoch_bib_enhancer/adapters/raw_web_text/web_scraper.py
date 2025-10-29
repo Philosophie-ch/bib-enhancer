@@ -3,7 +3,6 @@ Web scraping utility to fetch and clean text content from URLs.
 """
 
 import requests
-from typing import Optional
 
 try:
     from bs4 import BeautifulSoup
@@ -15,8 +14,6 @@ except ImportError:
 
 class WebScraperError(Exception):
     """Raised when web scraping fails."""
-
-    pass
 
 
 def fetch_url_text(url: str, timeout: int = 30) -> str:

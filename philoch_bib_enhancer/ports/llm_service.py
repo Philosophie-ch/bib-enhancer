@@ -39,5 +39,3 @@ class LLMService(Protocol):
 
 class LLMServiceError(Exception):
     """Raised when an LLM service operation fails."""
-
-    pass
