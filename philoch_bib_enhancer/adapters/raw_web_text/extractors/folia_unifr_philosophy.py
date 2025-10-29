@@ -9,7 +9,6 @@ import re
 import requests
 import time
 import json
-from typing import Optional
 from philoch_bib_enhancer.adapters.raw_web_text.raw_web_text_models import (
     RawWebTextBibitem,
     RawWebTextAuthor,
