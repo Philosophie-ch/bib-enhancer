@@ -242,8 +242,8 @@ for idx, link in enumerate(record_links, 1):
             year=year,
             authors=authors,
             journal=journal,
-            number=volume,  # Mapping volume to number field
-            issue=number,
+            volume=volume,
+            issue_number=number,
             start_page=start_page,
             end_page=end_page,
             doi=doi,

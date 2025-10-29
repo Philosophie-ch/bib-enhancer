@@ -23,8 +23,8 @@ class RawWebTextBibitem(BaseModel):
     authors: Optional[list[RawWebTextAuthor]] = Field(default_factory=list)
     editors: Optional[list[RawWebTextAuthor]] = Field(default_factory=list)
     journal: Optional[str] = None
-    issue: Optional[str] = None
-    number: Optional[str] = None  # volume number
+    volume: Optional[str] = None
+    issue_number: Optional[str] = None
     start_page: Optional[str] = None
     end_page: Optional[str] = None
     publisher: Optional[str] = None
