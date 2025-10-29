@@ -34,8 +34,8 @@ Extract the following fields when present:
 - authors: List of authors with given and family names
 - editors: List of editors with given and family names (for books, edited collections, etc.)
 - journal: The journal name (for journal articles)
-- issue: The journal issue
-- number: The volume number
+- volume: The volume number
+- issue_number: The issue number
 - start_page: The starting page number
 - end_page: The ending page number
 - publisher: The publisher name (for books)
