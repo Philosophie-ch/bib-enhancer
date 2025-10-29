@@ -4,11 +4,12 @@ Extract detailed bibliographic records from UNIFR Philosophy pages using structu
 This version uses JSON-LD and Dublin Core meta tags for accurate extraction.
 """
 
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Tag
 import re
 import requests
 import time
 import json
+from typing import Optional
 from philoch_bib_enhancer.adapters.raw_web_text.raw_web_text_models import (
     RawWebTextBibitem,
     RawWebTextAuthor,
@@ -25,11 +26,12 @@ soup = BeautifulSoup(html, 'html.parser')
 
 # Find all links to individual documents
 print("Finding document links...")
-record_links = []
-for link in soup.find_all('a', href=re.compile(r'/unifr/documents/\d+')):
-    href = link.get('href')
-    if href not in record_links:
-        record_links.append(href)
+record_links: list[str] = []
+for link_elem in soup.find_all('a', href=re.compile(r'/unifr/documents/\d+')):
+    if isinstance(link_elem, Tag):
+        href = link_elem.get('href')
+        if isinstance(href, str) and href not in record_links:
+            record_links.append(href)
 
 print(f"Found {len(record_links)} unique document links\n")
 
@@ -73,9 +75,13 @@ for idx, link in enumerate(record_links, 1):
 
         # === METHOD 1: Try JSON-LD first (most reliable) ===
         json_ld_script = record_soup.find('script', type='application/ld+json')
-        if json_ld_script:
+        if json_ld_script and isinstance(json_ld_script, Tag):
             try:
-                json_data = json.loads(json_ld_script.string)
+                script_string = json_ld_script.string
+                if script_string:
+                    json_data = json.loads(script_string)
+                else:
+                    json_data = {}
 
                 # Extract title
                 if 'name' in json_data:
@@ -115,69 +121,88 @@ for idx, link in enumerate(record_links, 1):
         # === METHOD 2: Use Dublin Core meta tags ===
         if not title:
             title_meta = record_soup.find('meta', attrs={'name': 'citation_title'})
-            if title_meta:
-                title = title_meta.get('content')
+            if title_meta and isinstance(title_meta, Tag):
+                content = title_meta.get('content')
+                if isinstance(content, str):
+                    title = content
 
         if not authors:
             author_metas = record_soup.find_all('meta', attrs={'name': 'citation_author'})
             for meta in author_metas:
-                name = meta.get('content', '').strip()
-                if name:
-                    # Try to parse "Family, Given" format
-                    if ',' in name:
-                        family, given = name.split(',', 1)
-                        authors.append(RawWebTextAuthor(given=given.strip(), family=family.strip()))
-                    else:
-                        # Assume "Given Family" format
-                        parts = name.split()
-                        if len(parts) >= 2:
-                            given = ' '.join(parts[:-1])
-                            family = parts[-1]
-                            authors.append(RawWebTextAuthor(given=given, family=family))
+                if isinstance(meta, Tag):
+                    content = meta.get('content', '')
+                    name = content.strip() if isinstance(content, str) else ''
+                    if name:
+                        # Try to parse "Family, Given" format
+                        if ',' in name:
+                            family, given = name.split(',', 1)
+                            authors.append(RawWebTextAuthor(given=given.strip(), family=family.strip()))
                         else:
-                            authors.append(RawWebTextAuthor(family=name))
+                            # Assume "Given Family" format
+                            parts = name.split()
+                            if len(parts) >= 2:
+                                given = ' '.join(parts[:-1])
+                                family = parts[-1]
+                                authors.append(RawWebTextAuthor(given=given, family=family))
+                            else:
+                                authors.append(RawWebTextAuthor(family=name))
 
         if not year:
             year_meta = record_soup.find('meta', attrs={'name': 'citation_publication_date'})
-            if year_meta:
-                year_str = year_meta.get('content', '')
+            if year_meta and isinstance(year_meta, Tag):
+                content = year_meta.get('content', '')
+                year_str = content if isinstance(content, str) else ''
                 year_match = re.search(r'\b(19|20)\d{2}\b', year_str)
                 if year_match:
                     year = int(year_match.group())
 
         # Extract DOI
         doi_meta = record_soup.find('meta', attrs={'name': 'citation_doi'})
-        if doi_meta:
-            doi = doi_meta.get('content')
+        if doi_meta and isinstance(doi_meta, Tag):
+            content = doi_meta.get('content')
+            if isinstance(content, str):
+                doi = content
 
         # Extract journal
         journal_meta = record_soup.find('meta', attrs={'name': 'citation_journal_title'})
-        if journal_meta:
-            journal = journal_meta.get('content')
+        if journal_meta and isinstance(journal_meta, Tag):
+            content = journal_meta.get('content')
+            if isinstance(content, str):
+                journal = content
 
         # Extract volume
         volume_meta = record_soup.find('meta', attrs={'name': 'citation_volume'})
-        if volume_meta:
-            volume = volume_meta.get('content')
+        if volume_meta and isinstance(volume_meta, Tag):
+            content = volume_meta.get('content')
+            if isinstance(content, str):
+                volume = content
 
         # Extract issue/number
         issue_meta = record_soup.find('meta', attrs={'name': 'citation_issue'})
-        if issue_meta:
-            number = issue_meta.get('content')
+        if issue_meta and isinstance(issue_meta, Tag):
+            content = issue_meta.get('content')
+            if isinstance(content, str):
+                number = content
 
         # Extract pages
         firstpage_meta = record_soup.find('meta', attrs={'name': 'citation_firstpage'})
-        if firstpage_meta:
-            start_page = firstpage_meta.get('content')
+        if firstpage_meta and isinstance(firstpage_meta, Tag):
+            content = firstpage_meta.get('content')
+            if isinstance(content, str):
+                start_page = content
 
         lastpage_meta = record_soup.find('meta', attrs={'name': 'citation_lastpage'})
-        if lastpage_meta:
-            end_page = lastpage_meta.get('content')
+        if lastpage_meta and isinstance(lastpage_meta, Tag):
+            content = lastpage_meta.get('content')
+            if isinstance(content, str):
+                end_page = content
 
         # Extract publisher
         publisher_meta = record_soup.find('meta', attrs={'name': 'citation_publisher'})
-        if publisher_meta:
-            publisher = publisher_meta.get('content')
+        if publisher_meta and isinstance(publisher_meta, Tag):
+            content = publisher_meta.get('content')
+            if isinstance(content, str):
+                publisher = content
 
         # Print extracted info
         if title:

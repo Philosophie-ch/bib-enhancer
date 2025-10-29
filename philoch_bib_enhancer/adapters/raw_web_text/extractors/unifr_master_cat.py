@@ -6,12 +6,13 @@ Uses POST requests with form parameters to get pre-filtered results.
 import requests
 import re
 import time
-from bs4 import BeautifulSoup
+from typing import Any, Optional
+from bs4 import BeautifulSoup, Tag
 from philoch_bib_enhancer.adapters.raw_web_text.raw_web_text_models import RawWebTextBibitem, RawWebTextAuthor
 from philoch_bib_enhancer.cli.manual_raw_web_text_to_csv import process_raw_bibitems
 
 
-def parse_author_string(author_str):
+def parse_author_string(author_str: Optional[str]) -> list[RawWebTextAuthor]:
     """Parse author string into RawWebTextAuthor."""
     if not author_str:
         return []
@@ -27,7 +28,7 @@ def parse_author_string(author_str):
             return [RawWebTextAuthor(family=author_str)]
 
 
-def fetch_filtered_page(page_num):
+def fetch_filtered_page(page_num: int) -> dict[str, Any]:
     """Fetch a page using POST with form parameters (as browser does)."""
     url = 'https://www.fr.ch/app/master_cat/get_results'
 
@@ -40,14 +41,15 @@ def fetch_filtered_page(page_num):
     }
 
     response = requests.post(url, data=data, timeout=15)
-    return response.json()
+    result: dict[str, Any] = response.json()
+    return result
 
 
-def extract_total_count(html):
+def extract_total_count(html: str) -> Optional[int]:
     """Extract total count from HTML."""
     soup = BeautifulSoup(html, 'html.parser')
     results_span = soup.find('span', class_='filter-results__item')
-    if results_span:
+    if results_span and isinstance(results_span, Tag):
         text = results_span.get_text(strip=True)
         match = re.search(r'(\d+)', text)
         if match:
@@ -55,36 +57,39 @@ def extract_total_count(html):
     return None
 
 
-def parse_page_items(html):
+def parse_page_items(html: str) -> list[dict[str, Any]]:
     """Parse items from HTML response."""
     soup = BeautifulSoup(html, 'html.parser')
-    items = []
+    items: list[dict[str, Any]] = []
 
     list_items = soup.find_all('li', class_='element-list')
 
-    for li in list_items:
+    for li_elem in list_items:
+        if not isinstance(li_elem, Tag):
+            continue
+        li: Tag = li_elem
         # Get item ID
         hidden_input = li.find('input', {'name': 'id-item'})
-        if not hidden_input:
+        if not hidden_input or not isinstance(hidden_input, Tag):
             continue
 
         item_id = hidden_input.get('value')
 
         # Extract title
         title_elem = li.find('h2', class_='h3')
-        full_title = title_elem.get_text(strip=True) if title_elem else None
+        full_title = title_elem.get_text(strip=True) if title_elem and isinstance(title_elem, Tag) else None
 
         # Extract author
         author_elem = li.find('p', class_='list__item__description')
-        author_str = author_elem.get_text(strip=True) if author_elem else None
+        author_str = author_elem.get_text(strip=True) if author_elem and isinstance(author_elem, Tag) else None
 
         # Extract metadata
         meta_dl = li.find('dl', class_='list__item__meta')
         classification = None
-        year = None
+        year: Optional[int] = None
         publisher = None
 
-        if meta_dl:
+        if meta_dl and isinstance(meta_dl, Tag):
             for dt, dd in zip(meta_dl.find_all('dt'), meta_dl.find_all('dd')):
                 dt_text = dt.get_text(strip=True)
                 dd_text = dd.get_text(strip=True)
@@ -102,6 +107,7 @@ def parse_page_items(html):
                             publisher = re.sub(r',?\s*\d{4}\s*$', '', publisher).strip()
 
         # Parse title/author
+        title: Optional[str]
         if full_title and ' / ' in full_title:
             title_parts = full_title.split(' / ', 1)
             title = title_parts[0].strip()
