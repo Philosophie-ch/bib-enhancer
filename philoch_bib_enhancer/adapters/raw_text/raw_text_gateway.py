@@ -1,5 +1,5 @@
 """
-RawWebTextGateway - Gateway for extracting bibliographic data from web pages using LLMs.
+RawTextGateway - Gateway for extracting bibliographic data from web pages using LLMs.
 
 This gateway follows the functional core / imperative shell pattern:
 - Configuration is passed as a NamedTuple
@@ -13,9 +13,9 @@ import sys
 from types import SimpleNamespace
 from typing import NamedTuple, Generator
 
-from philoch_bib_enhancer.adapters.raw_web_text.raw_web_text_models import RawWebTextBibitem
-from philoch_bib_enhancer.adapters.raw_web_text.raw_web_text_converter import convert_raw_web_text_to_bibitem
-from philoch_bib_enhancer.adapters.raw_web_text.web_scraper import fetch_url_text, WebScraperError
+from philoch_bib_enhancer.adapters.raw_text.raw_text_models import RawTextBibitem
+from philoch_bib_enhancer.adapters.raw_text.raw_text_converter import convert_raw_text_to_bibitem
+from philoch_bib_enhancer.adapters.raw_text.web_scraper import fetch_url_text, WebScraperError
 from philoch_bib_enhancer.domain.parsing_result import ParsedResult
 from philoch_bib_enhancer.ports.llm_service import LLMService, LLMServiceError
 from philoch_bib_sdk.logic.models import BibItem
@@ -52,9 +52,9 @@ Important notes:
 """
 
 
-class RawWebTextGatewayConfig(NamedTuple):
+class RawTextGatewayConfig(NamedTuple):
     """
-    Configuration for the RawWebTextGateway.
+    Configuration for the RawTextGateway.
     """
 
     llm_service: LLMService  # Abstract LLM service (Claude, OpenAI, etc.)
@@ -65,7 +65,7 @@ class RawWebTextGatewayConfig(NamedTuple):
 
 
 def get_bibitem_from_url(
-    config: RawWebTextGatewayConfig,
+    config: RawTextGatewayConfig,
     url: str,
 ) -> ParsedResult[BibItem]:
     """
@@ -93,7 +93,7 @@ def get_bibitem_from_url(
         try:
             raw_bibitem = config.llm_service.parse_to_model(
                 text=text,
-                model_class=RawWebTextBibitem,
+                model_class=RawTextBibitem,
                 system_prompt=BIBLIOGRAPHY_EXTRACTION_PROMPT,
             )
         except LLMServiceError as e:
@@ -104,7 +104,7 @@ def get_bibitem_from_url(
             }
 
         # Step 3: Convert to BibItem
-        bibitem_result = convert_raw_web_text_to_bibitem(raw_bibitem)
+        bibitem_result = convert_raw_text_to_bibitem(raw_bibitem)
 
         return bibitem_result
 
@@ -117,7 +117,7 @@ def get_bibitem_from_url(
 
 
 def get_bibitems_from_urls(
-    config: RawWebTextGatewayConfig,
+    config: RawTextGatewayConfig,
     urls: list[str],
 ) -> Generator[ParsedResult[BibItem], None, None]:
     """
@@ -140,7 +140,7 @@ def get_bibitems_from_urls(
 # --- Auto-configure ---
 
 
-def configure(config: RawWebTextGatewayConfig) -> SimpleNamespace:
+def configure(config: RawTextGatewayConfig) -> SimpleNamespace:
     """
     Return a namespace with all gateway functions bound to `config`.
 
@@ -150,7 +150,7 @@ def configure(config: RawWebTextGatewayConfig) -> SimpleNamespace:
     Example:
         >>> from adapters.llm.claude_llm_service import ClaudeLLMService
         >>> llm = ClaudeLLMService(api_key="...")
-        >>> config = RawWebTextGatewayConfig(llm_service=llm)
+        >>> config = RawTextGatewayConfig(llm_service=llm)
         >>> gateway = configure(config)
         >>> result = gateway.get_bibitem_from_url("https://example.com/article")
     """

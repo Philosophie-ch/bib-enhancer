@@ -1,7 +1,7 @@
 """
 Gateway-agnostic parsing result types.
 
-These types are used across all gateways (Crossref, RawWebText, etc.) to represent
+These types are used across all gateways (Crossref, RawText, etc.) to represent
 the result of parsing/converting data into BibItem objects.
 """
 

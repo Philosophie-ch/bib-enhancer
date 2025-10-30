@@ -1,21 +1,21 @@
 """
-Manual workflow for converting RawWebTextBibitem objects to CSV.
+Manual workflow for converting RawTextBibitem objects to CSV.
 
 This script enables a workflow where:
 1. Text is extracted from web pages (manually or via web_scraper)
-2. User (e.g., Claude) manually creates RawWebTextBibitem objects in Python
+2. User (e.g., Claude) manually creates RawTextBibitem objects in Python
 3. This script converts them to BibItem and outputs to CSV
 
 This bypasses the LLM service entirely, allowing for manual data extraction
 or using external LLM tools.
 
 Usage as a library:
-    from philoch_bib_enhancer.cli.manual_raw_web_text_to_csv import process_raw_bibitems
-    from philoch_bib_enhancer.adapters.raw_web_text.raw_web_text_models import RawWebTextBibitem
+    from philoch_bib_enhancer.cli.manual_raw_text_to_csv import process_raw_bibitems
+    from philoch_bib_enhancer.adapters.raw_text.raw_text_models import RawTextBibitem
 
-    # Create RawWebTextBibitem objects directly
+    # Create RawTextBibitem objects directly
     raw_bibitems = [
-        RawWebTextBibitem(
+        RawTextBibitem(
             title="Some Article",
             authors=[{"given": "John", "family": "Doe"}],
             year=2024,
@@ -32,7 +32,7 @@ Usage as a library:
     )
 
 Usage as a CLI (with JSON file):
-    python -m philoch_bib_enhancer.cli.manual_raw_web_text_to_csv -i input.json -o output.csv
+    python -m philoch_bib_enhancer.cli.manual_raw_text_to_csv -i input.json -o output.csv
 """
 
 import json
@@ -43,8 +43,8 @@ from aletk.utils import get_logger
 from philoch_bib_sdk.logic.models import BibItem
 from philoch_bib_sdk.adapters.tabular_data.read_journal_volume_number_index import ColumnNames
 
-from philoch_bib_enhancer.adapters.raw_web_text.raw_web_text_models import RawWebTextBibitem
-from philoch_bib_enhancer.adapters.raw_web_text.raw_web_text_converter import convert_raw_web_text_to_bibitem
+from philoch_bib_enhancer.adapters.raw_text.raw_text_models import RawTextBibitem
+from philoch_bib_enhancer.adapters.raw_text.raw_text_converter import convert_raw_text_to_bibitem
 from philoch_bib_enhancer.domain.parsing_result import ParsedResult
 
 # Reuse CSV writer from Crossref CLI
@@ -61,43 +61,43 @@ lgr = get_logger(__file__)
 # ============================================================================
 
 
-def load_raw_bibitems_from_json(file_path: str) -> list[RawWebTextBibitem]:
+def load_raw_bibitems_from_json(file_path: str) -> list[RawTextBibitem]:
     """
-    Load RawWebTextBibitem objects from a JSON file.
+    Load RawTextBibitem objects from a JSON file.
 
     The JSON file should contain either:
-    - A single RawWebTextBibitem object
-    - An array of RawWebTextBibitem objects
+    - A single RawTextBibitem object
+    - An array of RawTextBibitem objects
 
     Returns:
-        List of RawWebTextBibitem objects (validated with Pydantic)
+        List of RawTextBibitem objects (validated with Pydantic)
     """
     with open(file_path, "r", encoding="utf-8") as f:
         data = json.load(f)
 
     # Handle both single object and array
     if isinstance(data, list):
-        return [RawWebTextBibitem.model_validate(item) for item in data]
+        return [RawTextBibitem.model_validate(item) for item in data]
     else:
-        return [RawWebTextBibitem.model_validate(data)]
+        return [RawTextBibitem.model_validate(data)]
 
 
 def convert_raw_bibitems_to_parsed_results(
-    raw_bibitems: list[RawWebTextBibitem],
+    raw_bibitems: list[RawTextBibitem],
 ) -> Iterable[ParsedResult[BibItem]]:
     """
-    Convert a list of RawWebTextBibitem objects to ParsedResult[BibItem].
+    Convert a list of RawTextBibitem objects to ParsedResult[BibItem].
 
     This is a generator for consistency with the gateway pattern.
 
     Args:
-        raw_bibitems: List of RawWebTextBibitem objects
+        raw_bibitems: List of RawTextBibitem objects
 
     Yields:
         ParsedResult[BibItem] for each input (either success or error)
     """
     for raw_bibitem in raw_bibitems:
-        yield convert_raw_web_text_to_bibitem(raw_bibitem)
+        yield convert_raw_text_to_bibitem(raw_bibitem)
 
 
 # ============================================================================
@@ -106,25 +106,25 @@ def convert_raw_bibitems_to_parsed_results(
 
 
 def process_raw_bibitems(
-    raw_bibitems: list[RawWebTextBibitem],
+    raw_bibitems: list[RawTextBibitem],
     output_path: str,
     bibliography_path: str | None = None,
     column_names: ColumnNames | None = None,
 ) -> None:
     """
-    Process RawWebTextBibitem objects and write to CSV.
+    Process RawTextBibitem objects and write to CSV.
 
     This function can be used directly as a library, bypassing the CLI.
-    Useful for programmatic usage where RawWebTextBibitem objects are
+    Useful for programmatic usage where RawTextBibitem objects are
     created directly in Python code.
 
     Args:
-        raw_bibitems: List of RawWebTextBibitem objects to process
+        raw_bibitems: List of RawTextBibitem objects to process
         output_path: Path to output CSV file
         bibliography_path: Optional path to ODS file for bibkey matching
         column_names: Optional column names for bibkey matching (required if bibliography_path is set)
     """
-    lgr.info(f"Processing {len(raw_bibitems)} RawWebTextBibitem object(s)...")
+    lgr.info(f"Processing {len(raw_bibitems)} RawTextBibitem object(s)...")
 
     # === CONVERT TO BIBITEMS ===
     lgr.info("Converting to BibItem objects...")
@@ -165,14 +165,14 @@ def process_raw_bibitems(
 
 def parse_args() -> argparse.Namespace:
     """Parse command line arguments."""
-    parser = argparse.ArgumentParser(description="Convert RawWebTextBibitem JSON to CSV (manual workflow).")
+    parser = argparse.ArgumentParser(description="Convert RawTextBibitem JSON to CSV (manual workflow).")
 
     parser.add_argument(
         "--input",
         "-i",
         type=str,
         required=True,
-        help="Path to JSON file containing RawWebTextBibitem object(s).",
+        help="Path to JSON file containing RawTextBibitem object(s).",
     )
 
     parser.add_argument(
@@ -236,13 +236,13 @@ def cli() -> None:
     Main CLI entry point for manual workflow.
 
     This function:
-    1. Loads RawWebTextBibitem objects from JSON
+    1. Loads RawTextBibitem objects from JSON
     2. Calls process_raw_bibitems() to handle the rest
     """
     args = parse_args()
 
     # === LOAD INPUT ===
-    lgr.info(f"Loading RawWebTextBibitem objects from {args.input}...")
+    lgr.info(f"Loading RawTextBibitem objects from {args.input}...")
     raw_bibitems = load_raw_bibitems_from_json(args.input)
     lgr.info(f"Loaded {len(raw_bibitems)} item(s)")
 

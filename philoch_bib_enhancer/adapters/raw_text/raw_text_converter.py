@@ -1,5 +1,5 @@
 """
-Converter from RawWebTextBibitem (LLM-extracted data) to BibItem.
+Converter from RawTextBibitem (LLM-extracted data) to BibItem.
 """
 
 from typing import Tuple, Literal
@@ -15,12 +15,12 @@ from philoch_bib_sdk.logic.default_models import (
 )
 
 from philoch_bib_enhancer.domain.parsing_result import ParsedResult
-from philoch_bib_enhancer.adapters.raw_web_text.raw_web_text_models import RawWebTextBibitem
+from philoch_bib_enhancer.adapters.raw_text.raw_text_models import RawTextBibitem
 
 
-def _convert_raw_web_text_bibitem_to_bibitem(raw_bibitem: RawWebTextBibitem) -> BibItem:
+def _convert_raw_text_bibitem_to_bibitem(raw_bibitem: RawTextBibitem) -> BibItem:
     """
-    Convert a RawWebTextBibitem object into a BibItem instance.
+    Convert a RawTextBibitem object into a BibItem instance.
 
     Raises:
         ValueError: If required fields are missing or invalid.
@@ -96,7 +96,7 @@ def _convert_raw_web_text_bibitem_to_bibitem(raw_bibitem: RawWebTextBibitem) -> 
         "publisher": publisher,
         "doi": raw_bibitem.doi or "",
         "url": raw_bibitem.url or "",
-        "_bib_info_source": "RawWebText (LLM)",
+        "_bib_info_source": "RawText (LLM)",
     }
 
     # Add journal if present
@@ -108,18 +108,18 @@ def _convert_raw_web_text_bibitem_to_bibitem(raw_bibitem: RawWebTextBibitem) -> 
     return result
 
 
-def convert_raw_web_text_to_bibitem(raw_bibitem: RawWebTextBibitem) -> ParsedResult[BibItem]:
+def convert_raw_text_to_bibitem(raw_bibitem: RawTextBibitem) -> ParsedResult[BibItem]:
     """
-    Convert a RawWebTextBibitem to a BibItem instance with error handling.
+    Convert a RawTextBibitem to a BibItem instance with error handling.
 
     Args:
-        raw_bibitem: The RawWebTextBibitem extracted by LLM
+        raw_bibitem: The RawTextBibitem extracted by LLM
 
     Returns:
         A ParsedResult containing either a BibItem or an error
     """
     try:
-        bibitem = _convert_raw_web_text_bibitem_to_bibitem(raw_bibitem)
+        bibitem = _convert_raw_text_bibitem_to_bibitem(raw_bibitem)
         return {
             "out": bibitem,
             "parsing_status": "success",
@@ -128,6 +128,6 @@ def convert_raw_web_text_to_bibitem(raw_bibitem: RawWebTextBibitem) -> ParsedRes
     except Exception as e:
         return {
             "parsing_status": "error",
-            "message": f"Failed to convert RawWebTextBibitem to BibItem: {e}",
+            "message": f"Failed to convert RawTextBibitem to BibItem: {e}",
             "context": raw_bibitem.model_dump_json(),
         }

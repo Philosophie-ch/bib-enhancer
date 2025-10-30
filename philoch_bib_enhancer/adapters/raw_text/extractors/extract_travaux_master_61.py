@@ -1,5 +1,5 @@
 """
-Extract exactly 466 philosophy theses using server-side filtering.
+Extract exactly 61 philosophy master's works (travaux de master) using server-side filtering.
 Uses POST requests with form parameters to get pre-filtered results.
 """
 
@@ -8,24 +8,24 @@ import re
 import time
 from typing import Any, Optional
 from bs4 import BeautifulSoup, Tag
-from philoch_bib_enhancer.adapters.raw_web_text.raw_web_text_models import RawWebTextBibitem, RawWebTextAuthor
-from philoch_bib_enhancer.cli.manual_raw_web_text_to_csv import process_raw_bibitems
+from philoch_bib_enhancer.adapters.raw_text.raw_text_models import RawTextBibitem, RawTextAuthor
+from philoch_bib_enhancer.cli.manual_raw_text_to_csv import process_raw_bibitems
 
 
-def parse_author_string(author_str: Optional[str]) -> list[RawWebTextAuthor]:
-    """Parse author string into RawWebTextAuthor."""
+def parse_author_string(author_str: Optional[str]) -> list[RawTextAuthor]:
+    """Parse author string into RawTextAuthor."""
     if not author_str:
         return []
     author_str = author_str.strip()
     if ',' in author_str:
         parts = [p.strip() for p in author_str.split(',', 1)]
-        return [RawWebTextAuthor(family=parts[0], given=parts[1] if len(parts) > 1 else None)]
+        return [RawTextAuthor(family=parts[0], given=parts[1] if len(parts) > 1 else None)]
     else:
         parts = author_str.rsplit(' ', 1)
         if len(parts) == 2:
-            return [RawWebTextAuthor(given=parts[0], family=parts[1])]
+            return [RawTextAuthor(given=parts[0], family=parts[1])]
         else:
-            return [RawWebTextAuthor(family=author_str)]
+            return [RawTextAuthor(family=author_str)]
 
 
 def fetch_filtered_page(page_num: int) -> dict[str, Any]:
@@ -35,7 +35,7 @@ def fetch_filtered_page(page_num: int) -> dict[str, Any]:
     # POST data with form parameters - exactly as the browser sends
     data = {
         'form[f_faculty]': '2',  # Faculty of Letters
-        'form[f_document]': '1',  # Thèses (doctoral theses)
+        'form[f_document]': '4',  # Travaux de master (master's works)
         'form[f_subject_category]': '40',  # Philosophie
         'page': str(page_num),
     }
@@ -96,9 +96,15 @@ def parse_page_items(html: str) -> list[dict[str, Any]]:
 
                 if 'Classification' in dt_text:
                     classification = dd_text
-                    year_match = re.search(r'(\d{4})', classification)
+                    # Extract year from "MASTFR FACLET YYYY" format
+                    year_match = re.search(r'MASTFR\s+FACLET\s+(\d{4})', classification)
                     if year_match:
                         year = int(year_match.group(1))
+                    else:
+                        # Fallback: just look for any 4-digit year
+                        year_match = re.search(r'(\d{4})', classification)
+                        if year_match:
+                            year = int(year_match.group(1))
                 elif 'Lieu, Année' in dt_text or 'Lieu, année' in dt_text:
                     if ':' in dd_text:
                         parts = dd_text.split(':', 1)
@@ -136,10 +142,10 @@ def parse_page_items(html: str) -> list[dict[str, Any]]:
 
 # Main execution
 print("=" * 80)
-print("EXTRACTING 466 PHILOSOPHY THESES USING SERVER-SIDE FILTERING")
+print("EXTRACTING 61 PHILOSOPHY MASTER'S WORKS (TRAVAUX DE MASTER) USING SERVER-SIDE FILTERING")
 print("=" * 80)
 print("\nUsing POST with form parameters to get pre-filtered results...")
-print("This should take 2-3 minutes.\n")
+print("This should take less than a minute.\n")
 
 all_items = []
 
@@ -170,8 +176,7 @@ if total_count:
 
             if items:
                 all_items.extend(items)
-                if page_num % 5 == 0:
-                    print(f"Page {page_num}/{total_pages}: {len(all_items)} items collected so far...")
+                print(f"Page {page_num}/{total_pages}: {len(all_items)} items collected so far...")
             else:
                 print(f"No items on page {page_num}. Stopping.")
                 break
@@ -188,13 +193,21 @@ print(f"{'=' * 80}")
 print(f"Total items collected: {len(all_items)}")
 print(f"{'=' * 80}\n")
 
-# Convert to RawWebTextBibitem
-print("Converting to RawWebTextBibitem objects...")
+# Show some sample years to verify extraction
+print("Sample entries with years extracted:")
+for i, item in enumerate(all_items[:5]):
+    print(
+        f"  {i+1}. {item.get('title', 'N/A')[:60]}... -> Year: {item.get('year', 'N/A')} (from: {item.get('classification', 'N/A')})"
+    )
+print()
+
+# Convert to RawTextBibitem
+print("Converting to RawTextBibitem objects...")
 raw_bibitems = []
 for item in all_items:
-    bibitem = RawWebTextBibitem(
+    bibitem = RawTextBibitem(
         raw_text=item['raw_text'],
-        type='phdthesis',
+        type='mastersthesis',
         title=item['title'],
         year=item['year'],
         authors=item['authors'],
@@ -203,7 +216,7 @@ for item in all_items:
     raw_bibitems.append(bibitem)
 
 # Save to CSV
-output_path = "./data/test-2/philosophy_theses_466.csv"
+output_path = "./data/test-2/philosophy_travaux_master_61.csv"
 print(f"\nWriting {len(raw_bibitems)} items to {output_path}...")
 
 process_raw_bibitems(
@@ -216,5 +229,5 @@ print(f"\n{'=' * 80}")
 print(f"✓ SUCCESS!")
 print(f"{'=' * 80}")
 print(f"  Output: {output_path}")
-print(f"  Total:  {len(raw_bibitems)} philosophy theses")
+print(f"  Total:  {len(raw_bibitems)} philosophy master's works")
 print(f"{'=' * 80}")
