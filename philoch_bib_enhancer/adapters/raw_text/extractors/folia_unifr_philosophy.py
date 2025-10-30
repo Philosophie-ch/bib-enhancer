@@ -9,11 +9,11 @@ import re
 import requests
 import time
 import json
-from philoch_bib_enhancer.adapters.raw_web_text.raw_web_text_models import (
-    RawWebTextBibitem,
-    RawWebTextAuthor,
+from philoch_bib_enhancer.adapters.raw_text.raw_text_models import (
+    RawTextBibitem,
+    RawTextAuthor,
 )
-from philoch_bib_enhancer.cli.manual_raw_web_text_to_csv import process_raw_bibitems
+from philoch_bib_enhancer.cli.manual_raw_text_to_csv import process_raw_bibitems
 
 html_path = "data/unifr-philo.html"
 
@@ -96,16 +96,16 @@ for idx, link in enumerate(record_links, 1):
                                 # Try to parse "Family, Given" or "Given Family"
                                 if ',' in name:
                                     family, given = name.split(',', 1)
-                                    authors.append(RawWebTextAuthor(given=given.strip(), family=family.strip()))
+                                    authors.append(RawTextAuthor(given=given.strip(), family=family.strip()))
                                 else:
                                     # Assume "Given Family" format
                                     parts = name.strip().split()
                                     if len(parts) >= 2:
                                         given = ' '.join(parts[:-1])
                                         family = parts[-1]
-                                        authors.append(RawWebTextAuthor(given=given, family=family))
+                                        authors.append(RawTextAuthor(given=given, family=family))
                                     else:
-                                        authors.append(RawWebTextAuthor(family=name))
+                                        authors.append(RawTextAuthor(family=name))
 
                 # Extract year
                 if 'datePublished' in json_data:
@@ -135,16 +135,16 @@ for idx, link in enumerate(record_links, 1):
                         # Try to parse "Family, Given" format
                         if ',' in name:
                             family, given = name.split(',', 1)
-                            authors.append(RawWebTextAuthor(given=given.strip(), family=family.strip()))
+                            authors.append(RawTextAuthor(given=given.strip(), family=family.strip()))
                         else:
                             # Assume "Given Family" format
                             parts = name.split()
                             if len(parts) >= 2:
                                 given = ' '.join(parts[:-1])
                                 family = parts[-1]
-                                authors.append(RawWebTextAuthor(given=given, family=family))
+                                authors.append(RawTextAuthor(given=given, family=family))
                             else:
-                                authors.append(RawWebTextAuthor(family=name))
+                                authors.append(RawTextAuthor(family=name))
 
         if not year:
             year_meta = record_soup.find('meta', attrs={'name': 'citation_publication_date'})
@@ -235,7 +235,7 @@ for idx, link in enumerate(record_links, 1):
             raw_text = record_soup.get_text(separator=' ', strip=True)[:1000]
 
         # Create bibitem
-        bibitem = RawWebTextBibitem(
+        bibitem = RawTextBibitem(
             raw_text=raw_text,
             type=pub_type,
             title=title,

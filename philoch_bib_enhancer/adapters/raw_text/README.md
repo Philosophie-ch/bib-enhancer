@@ -1,10 +1,10 @@
-# RawWebText Gateway
+# RawText Gateway
 
 Extract bibliographic data from web pages using Large Language Models (LLMs).
 
 ## Overview
 
-The RawWebTextGateway allows you to extract structured bibliographic information from arbitrary web pages. It uses LLMs (Claude or OpenAI) to parse unstructured text and convert it into `BibItem` objects.
+The RawTextGateway allows you to extract structured bibliographic information from arbitrary web pages. It uses LLMs (Claude or OpenAI) to parse unstructured text and convert it into `BibItem` objects.
 
 **Supports various publication types:** articles, books, book chapters, edited collections, and more.
 
@@ -14,13 +14,13 @@ Following the project's **functional core / imperative shell** pattern:
 
 ```
 ┌─────────────────────────────────────────────────────┐
-│ RawWebTextGateway (adapters/raw_web_text/)         │
+│ RawTextGateway (adapters/raw_text/)         │
 ├─────────────────────────────────────────────────────┤
 │                                                      │
 │  1. Fetch URL → web_scraper.py                     │
 │  2. Parse with LLM → llm_service (port)            │
-│  3. LLM returns → RawWebTextBibitem (Pydantic)     │
-│  4. Convert → raw_web_text_converter.py            │
+│  3. LLM returns → RawTextBibitem (Pydantic)     │
+│  4. Convert → raw_text_converter.py            │
 │  5. Output → BibItem (philoch-bib-sdk)             │
 │                                                      │
 └─────────────────────────────────────────────────────┘
@@ -28,20 +28,20 @@ Following the project's **functional core / imperative shell** pattern:
 
 ## Components
 
-### 1. Models ([raw_web_text_models.py](raw_web_text_models.py))
+### 1. Models ([raw_text_models.py](raw_text_models.py))
 
-**`RawWebTextBibitem`** - Intermediate Pydantic model for LLM-extracted data
+**`RawTextBibitem`** - Intermediate Pydantic model for LLM-extracted data
 
 All fields are optional to handle partial/incomplete data:
 
 ```python
-class RawWebTextBibitem(BaseModel):
+class RawTextBibitem(BaseModel):
     raw_text: Optional[str]       # Raw text snippet identified as bibitem (with markup)
     type: Optional[str]           # "article", "book", "chapter", "inbook", "incollection"
     title: Optional[str]
     year: Optional[int]
-    authors: Optional[list[RawWebTextAuthor]]
-    editors: Optional[list[RawWebTextAuthor]]  # For books, edited collections
+    authors: Optional[list[RawTextAuthor]]
+    editors: Optional[list[RawTextAuthor]]  # For books, edited collections
     journal: Optional[str]
     issue: Optional[str]
     number: Optional[str]         # volume number
@@ -84,35 +84,35 @@ def fetch_url_text(url: str, timeout: int = 30) -> str:
     ...
 ```
 
-### 5. Converter ([raw_web_text_converter.py](raw_web_text_converter.py))
+### 5. Converter ([raw_text_converter.py](raw_text_converter.py))
 
-Converts `RawWebTextBibitem` → `BibItem`:
+Converts `RawTextBibitem` → `BibItem`:
 
 ```python
-def convert_raw_web_text_to_bibitem(
-    raw_bibitem: RawWebTextBibitem
+def convert_raw_text_to_bibitem(
+    raw_bibitem: RawTextBibitem
 ) -> ParsedResult[BibItem]:
     ...
 ```
 
 Returns `ParsingSuccess[BibItem]` or `ParsingError` with error details.
 
-### 6. Gateway ([raw_web_text_gateway.py](raw_web_text_gateway.py))
+### 6. Gateway ([raw_text_gateway.py](raw_text_gateway.py))
 
 Main orchestration following the gateway pattern:
 
 ```python
-class RawWebTextGatewayConfig(NamedTuple):
+class RawTextGatewayConfig(NamedTuple):
     llm_service: LLMService
     timeout: int = 30
 
 def get_bibitem_from_url(
-    config: RawWebTextGatewayConfig,
+    config: RawTextGatewayConfig,
     url: str,
 ) -> ParsedResult[BibItem]:
     ...
 
-def configure(config: RawWebTextGatewayConfig) -> SimpleNamespace:
+def configure(config: RawTextGatewayConfig) -> SimpleNamespace:
     """Bind all gateway functions to config."""
     ...
 ```
@@ -147,8 +147,8 @@ export OPENAI_API_KEY="your-key-here"
 ```python
 import os
 from philoch_bib_enhancer.adapters.llm.claude_llm_service import ClaudeLLMService
-from philoch_bib_enhancer.adapters.raw_web_text import (
-    RawWebTextGatewayConfig,
+from philoch_bib_enhancer.adapters.raw_text import (
+    RawTextGatewayConfig,
     configure,
 )
 from philoch_bib_enhancer.adapters.crossref.crossref_models import is_parsing_success
@@ -157,7 +157,7 @@ from philoch_bib_enhancer.adapters.crossref.crossref_models import is_parsing_su
 llm = ClaudeLLMService(api_key=os.getenv("ANTHROPIC_API_KEY"))
 
 # 2. Configure gateway
-config = RawWebTextGatewayConfig(llm_service=llm)
+config = RawTextGatewayConfig(llm_service=llm)
 gateway = configure(config)
 
 # 3. Extract from URL
@@ -178,7 +178,7 @@ else:
 from philoch_bib_enhancer.adapters.llm.openai_llm_service import OpenAILLMService
 
 llm = OpenAILLMService(api_key=os.getenv("OPENAI_API_KEY"))
-config = RawWebTextGatewayConfig(llm_service=llm)
+config = RawTextGatewayConfig(llm_service=llm)
 gateway = configure(config)
 ```
 
@@ -319,13 +319,13 @@ Important notes:
 """
 ```
 
-You can customize this by modifying the prompt in [raw_web_text_gateway.py](raw_web_text_gateway.py).
+You can customize this by modifying the prompt in [raw_text_gateway.py](raw_text_gateway.py).
 
 ## Design Decisions
 
 ### Why an Intermediate Model?
 
-The `RawWebTextBibitem` model serves as a **validation boundary** between the LLM and BibItem:
+The `RawTextBibitem` model serves as a **validation boundary** between the LLM and BibItem:
 
 1. **Flexible input** - All fields optional to handle partial data from various publication types
 2. **LLM-friendly** - Simple structure for structured output
@@ -348,17 +348,17 @@ Using a `Protocol` instead of a base class allows:
 Test the converter with mock data:
 
 ```python
-def test_convert_raw_web_text_to_bibitem():
-    raw_bibitem = RawWebTextBibitem(
+def test_convert_raw_text_to_bibitem():
+    raw_bibitem = RawTextBibitem(
         type="article",
         title="Test Article",
         year=2024,
         authors=[
-            RawWebTextAuthor(given="John", family="Smith")
+            RawTextAuthor(given="John", family="Smith")
         ],
     )
 
-    result = convert_raw_web_text_to_bibitem(raw_bibitem)
+    result = convert_raw_text_to_bibitem(raw_bibitem)
 
     assert is_parsing_success(result)
     assert result["out"].title.latex == "Test Article"
@@ -374,7 +374,7 @@ import pytest
 @pytest.mark.external
 def test_extract_from_real_url():
     llm = ClaudeLLMService(api_key=os.getenv("ANTHROPIC_API_KEY"))
-    config = RawWebTextGatewayConfig(llm_service=llm)
+    config = RawTextGatewayConfig(llm_service=llm)
     gateway = configure(config)
 
     result = gateway.get_bibitem_from_url("https://example.com/article")
@@ -385,7 +385,7 @@ def test_extract_from_real_url():
 ## Performance Considerations
 
 1. **Rate limits** - LLM APIs have rate limits; add delays for batch processing
-2. **Timeout** - Configure web scraping timeout via `RawWebTextGatewayConfig(timeout=60)`
+2. **Timeout** - Configure web scraping timeout via `RawTextGatewayConfig(timeout=60)`
 3. **Caching** - Consider caching LLM responses for repeated URLs
 4. **Cost** - Each URL = 1 LLM API call (text extraction + parsing)
 
@@ -404,4 +404,4 @@ Potential improvements:
 
 - [Architecture Overview](../../../docs/architecture.md)
 - [Crossref Gateway](../crossref/) - Similar pattern for Crossref API
-- [Example Usage](../../../examples/raw_web_text_example.py)
+- [Example Usage](../../../examples/raw_text_example.py)

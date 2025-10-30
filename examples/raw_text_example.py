@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Example usage of RawWebTextGateway to extract bibliographic data from web pages.
+Example usage of RawTextGateway to extract bibliographic data from web pages.
 Supports various publication types: articles, books, book chapters, edited collections, etc.
 
 Prerequisites:
@@ -19,8 +19,8 @@ Prerequisites:
 """
 
 import os
-from philoch_bib_enhancer.adapters.raw_web_text import (
-    RawWebTextGatewayConfig,
+from philoch_bib_enhancer.adapters.raw_text import (
+    RawTextGatewayConfig,
     configure,
 )
 from philoch_bib_enhancer.domain.parsing_result import is_parsing_success
@@ -38,7 +38,7 @@ def example_with_claude() -> None:
     llm_service = ClaudeLLMService(api_key=api_key)
 
     # Configure the gateway
-    config = RawWebTextGatewayConfig(llm_service=llm_service, timeout=30)
+    config = RawTextGatewayConfig(llm_service=llm_service, timeout=30)
     gateway = configure(config)
 
     # Example URL (replace with actual URL)
@@ -73,7 +73,7 @@ def example_with_openai() -> None:
     llm_service = OpenAILLMService(api_key=api_key)
 
     # Configure the gateway
-    config = RawWebTextGatewayConfig(llm_service=llm_service, timeout=30)
+    config = RawTextGatewayConfig(llm_service=llm_service, timeout=30)
     gateway = configure(config)
 
     # Example URL (replace with actual URL)
@@ -105,7 +105,7 @@ def example_batch_processing() -> None:
         raise ValueError("ANTHROPIC_API_KEY environment variable not set")
 
     llm_service = ClaudeLLMService(api_key=api_key)
-    config = RawWebTextGatewayConfig(llm_service=llm_service)
+    config = RawTextGatewayConfig(llm_service=llm_service)
     gateway = configure(config)
 
     # List of URLs to process

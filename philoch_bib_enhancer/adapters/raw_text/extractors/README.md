@@ -51,10 +51,10 @@ Example of extracted data structure for validation
 
 **Approach**:
 ```python
-from philoch_bib_enhancer.adapters.raw_web_text.web_scraper import fetch_url_text
+from philoch_bib_enhancer.adapters.raw_text.web_scraper import fetch_url_text
 
 text = fetch_url_text(url)
-# Parse HTML, create RawWebTextBibitem objects
+# Parse HTML, create RawTextBibitem objects
 ```
 
 ### Pattern 2: API with Form Parameters
@@ -180,16 +180,16 @@ Before processing thousands of items:
 - Sites go down
 - Document these when they happen
 
-## RawWebText Workflow
+## RawText Workflow
 
-All extractors follow the RawWebText manual workflow:
+All extractors follow the RawText manual workflow:
 
 1. **Fetch**: Get page/API content
 2. **Parse**: Identify bibliographic references
-3. **Model**: Create `RawWebTextBibitem` objects
+3. **Model**: Create `RawTextBibitem` objects
 4. **Convert**: Use `process_raw_bibitems()` → CSV
 
-See [`manual_raw_web_text_to_csv.py`](../cli/manual_raw_web_text_to_csv.py) for the conversion function.
+See [`manual_raw_text_to_csv.py`](../cli/manual_raw_text_to_csv.py) for the conversion function.
 
 ## Registry Maintenance
 

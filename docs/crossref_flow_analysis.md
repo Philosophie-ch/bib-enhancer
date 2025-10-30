@@ -223,18 +223,18 @@ This means:
 - **All items tracked** (success or failure)
 - **Easy debugging** via context field
 
-## For RawWebText Gateway
+## For RawText Gateway
 
 We need to mirror this pattern:
 
 1. **Gateway function** that returns `Generator[ParsedResult[BibItem], None, None]`
 2. **Input model** that specifies what to scrape (e.g., list of URLs)
-3. **Converter** from `RawWebTextBibitem → BibItem` (already done!)
+3. **Converter** from `RawTextBibitem → BibItem` (already done!)
 4. **CSV writer** (can reuse Crossref's `write_articles_to_csv`)
 5. **CLI** that wires everything together
 6. **Optionally:** Bibkey matching (can reuse existing)
 
-### Key Differences for RawWebText:
+### Key Differences for RawText:
 
 - **Input:** List of URLs instead of ISSN + year range
 - **Fetching:** Web scraping instead of API calls
@@ -243,8 +243,8 @@ We need to mirror this pattern:
 
 ### What We Already Have:
 
-✅ `RawWebTextBibitem` model (intermediate)
-✅ `convert_raw_web_text_to_bibitem()` converter
+✅ `RawTextBibitem` model (intermediate)
+✅ `convert_raw_text_to_bibitem()` converter
 ✅ `get_bibitem_from_url()` gateway function
 
 ### What We Need:

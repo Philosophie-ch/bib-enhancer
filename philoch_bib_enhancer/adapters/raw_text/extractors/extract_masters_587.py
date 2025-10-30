@@ -8,24 +8,24 @@ import re
 import time
 from typing import Any, Optional
 from bs4 import BeautifulSoup, Tag
-from philoch_bib_enhancer.adapters.raw_web_text.raw_web_text_models import RawWebTextBibitem, RawWebTextAuthor
-from philoch_bib_enhancer.cli.manual_raw_web_text_to_csv import process_raw_bibitems
+from philoch_bib_enhancer.adapters.raw_text.raw_text_models import RawTextBibitem, RawTextAuthor
+from philoch_bib_enhancer.cli.manual_raw_text_to_csv import process_raw_bibitems
 
 
-def parse_author_string(author_str: Optional[str]) -> list[RawWebTextAuthor]:
-    """Parse author string into RawWebTextAuthor."""
+def parse_author_string(author_str: Optional[str]) -> list[RawTextAuthor]:
+    """Parse author string into RawTextAuthor."""
     if not author_str:
         return []
     author_str = author_str.strip()
     if ',' in author_str:
         parts = [p.strip() for p in author_str.split(',', 1)]
-        return [RawWebTextAuthor(family=parts[0], given=parts[1] if len(parts) > 1 else None)]
+        return [RawTextAuthor(family=parts[0], given=parts[1] if len(parts) > 1 else None)]
     else:
         parts = author_str.rsplit(' ', 1)
         if len(parts) == 2:
-            return [RawWebTextAuthor(given=parts[0], family=parts[1])]
+            return [RawTextAuthor(given=parts[0], family=parts[1])]
         else:
-            return [RawWebTextAuthor(family=author_str)]
+            return [RawTextAuthor(family=author_str)]
 
 
 def fetch_filtered_page(page_num: int) -> dict[str, Any]:
@@ -202,11 +202,11 @@ for i, item in enumerate(all_items[:5]):
     )
 print()
 
-# Convert to RawWebTextBibitem
-print("Converting to RawWebTextBibitem objects...")
+# Convert to RawTextBibitem
+print("Converting to RawTextBibitem objects...")
 raw_bibitems = []
 for item in all_items:
-    bibitem = RawWebTextBibitem(
+    bibitem = RawTextBibitem(
         raw_text=item['raw_text'],
         type='mastersthesis',  # Changed from 'thesis' to 'mastersthesis'
         title=item['title'],

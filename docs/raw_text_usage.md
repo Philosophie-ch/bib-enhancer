@@ -1,6 +1,6 @@
-# RawWebText Gateway Usage Guide
+# RawText Gateway Usage Guide
 
-The RawWebText gateway enables extraction of bibliographic data from web pages using LLM services (Claude or OpenAI) or manual extraction.
+The RawText gateway enables extraction of bibliographic data from web pages using LLM services (Claude or OpenAI) or manual extraction.
 
 ## Architecture Overview
 
@@ -9,7 +9,7 @@ The RawWebText gateway enables extraction of bibliographic data from web pages u
 │                     TWO WORKFLOWS AVAILABLE                      │
 ├─────────────────────────────────────────────────────────────────┤
 │  1. Automated: CLI → LLM Service → BibItem → CSV               │
-│  2. Manual: Python/JSON → RawWebTextBibitem → BibItem → CSV    │
+│  2. Manual: Python/JSON → RawTextBibitem → BibItem → CSV    │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -35,7 +35,7 @@ OPENAI_API_KEY=sk-...
 #### CLI with URL arguments
 
 ```bash
-python -m philoch_bib_enhancer.cli.raw_web_text_scraping_cli \
+python -m philoch_bib_enhancer.cli.raw_text_scraping_cli \
   --urls https://example.com/article1 https://example.com/article2 \
   --output results.csv
 ```
@@ -53,7 +53,7 @@ https://example.com/article3
 Then run:
 
 ```bash
-python -m philoch_bib_enhancer.cli.raw_web_text_scraping_cli \
+python -m philoch_bib_enhancer.cli.raw_text_scraping_cli \
   --urls-file urls.txt \
   --output results.csv
 ```
@@ -63,7 +63,7 @@ python -m philoch_bib_enhancer.cli.raw_web_text_scraping_cli \
 If you have an existing bibliography in ODS format, you can match bibkeys:
 
 ```bash
-python -m philoch_bib_enhancer.cli.raw_web_text_scraping_cli \
+python -m philoch_bib_enhancer.cli.raw_text_scraping_cli \
   --urls-file urls.txt \
   --output results.csv \
   --bibliography-path /path/to/bibliography.ods \
@@ -77,14 +77,14 @@ python -m philoch_bib_enhancer.cli.raw_web_text_scraping_cli \
 
 ```python
 from philoch_bib_enhancer.adapters.llm.claude_llm_service import ClaudeLLMService
-from philoch_bib_enhancer.adapters.raw_web_text import raw_web_text_gateway
+from philoch_bib_enhancer.adapters.raw_text import raw_text_gateway
 
 # Setup LLM service
 llm = ClaudeLLMService(api_key="sk-ant-...")
 
 # Configure gateway
-config = raw_web_text_gateway.RawWebTextGatewayConfig(llm_service=llm)
-gateway = raw_web_text_gateway.configure(config)
+config = raw_text_gateway.RawTextGatewayConfig(llm_service=llm)
+gateway = raw_text_gateway.configure(config)
 
 # Process URLs
 urls = ["https://example.com/article1", "https://example.com/article2"]
@@ -109,24 +109,24 @@ Use this when:
 
 ### Direct Python Usage (Recommended)
 
-Create `RawWebTextBibitem` objects directly in Python:
+Create `RawTextBibitem` objects directly in Python:
 
 ```python
-from philoch_bib_enhancer.cli.manual_raw_web_text_to_csv import process_raw_bibitems
-from philoch_bib_enhancer.adapters.raw_web_text.raw_web_text_models import (
-    RawWebTextBibitem,
-    RawWebTextAuthor,
+from philoch_bib_enhancer.cli.manual_raw_text_to_csv import process_raw_bibitems
+from philoch_bib_enhancer.adapters.raw_text.raw_text_models import (
+    RawTextBibitem,
+    RawTextAuthor,
 )
 
-# Create RawWebTextBibitem objects
+# Create RawTextBibitem objects
 raw_bibitems = [
-    RawWebTextBibitem(
+    RawTextBibitem(
         raw_text="Doe, John (2024). 'Understanding Architecture', Journal of Software, 15(3), pp. 45-67.",
         type="article",
         title="Understanding Architecture",
         year=2024,
         authors=[
-            RawWebTextAuthor(given="John", family="Doe"),
+            RawTextAuthor(given="John", family="Doe"),
         ],
         journal="Journal of Software",
         volume="15",
@@ -147,7 +147,7 @@ process_raw_bibitems(
 
 If you prefer working with JSON files:
 
-1. Create a JSON file with `RawWebTextBibitem` objects:
+1. Create a JSON file with `RawTextBibitem` objects:
 
 ```json
 [
@@ -174,7 +174,7 @@ If you prefer working with JSON files:
 2. Convert to CSV:
 
 ```bash
-python -m philoch_bib_enhancer.cli.manual_raw_web_text_to_csv \
+python -m philoch_bib_enhancer.cli.manual_raw_text_to_csv \
   --input bibitems.json \
   --output results.csv
 ```
@@ -197,18 +197,18 @@ process_raw_bibitems(
 )
 ```
 
-## RawWebTextBibitem Model
+## RawTextBibitem Model
 
 The intermediate Pydantic model has these fields (all optional):
 
 ```python
-class RawWebTextBibitem(BaseModel):
+class RawTextBibitem(BaseModel):
     raw_text: Optional[str] = None          # Original text snippet
     type: Optional[str] = None              # "article", "book", "incollection", etc.
     title: Optional[str] = None
     year: Optional[int] = None
-    authors: Optional[list[RawWebTextAuthor]] = Field(default_factory=list)
-    editors: Optional[list[RawWebTextAuthor]] = Field(default_factory=list)
+    authors: Optional[list[RawTextAuthor]] = Field(default_factory=list)
+    editors: Optional[list[RawTextAuthor]] = Field(default_factory=list)
     journal: Optional[str] = None
     volume: Optional[str] = None
     number: Optional[str] = None
@@ -218,7 +218,7 @@ class RawWebTextBibitem(BaseModel):
     doi: Optional[str] = None
     url: Optional[str] = None
 
-class RawWebTextAuthor(BaseModel):
+class RawTextAuthor(BaseModel):
     given: str = ""
     family: str = ""
 ```
@@ -266,12 +266,12 @@ All results (success and error) are written to CSV with status indicators.
 ## Examples
 
 See:
-- [examples/raw_web_text_example.py](../examples/raw_web_text_example.py) - Automated LLM workflow
+- [examples/raw_text_example.py](../examples/raw_text_example.py) - Automated LLM workflow
 - [examples/manual_workflow_example.py](../examples/manual_workflow_example.py) - Manual workflow
 
 ## Comparison with Crossref Gateway
 
-| Feature | Crossref Gateway | RawWebText Gateway |
+| Feature | Crossref Gateway | RawText Gateway |
 |---------|------------------|-------------------|
 | Input | ISSN + year range | URLs or Python objects |
 | Data source | Crossref API | Web pages or manual |

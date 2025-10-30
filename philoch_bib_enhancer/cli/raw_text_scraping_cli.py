@@ -1,5 +1,5 @@
 """
-CLI entry point for RawWebText scraping.
+CLI entry point for RawText scraping.
 
 This is the imperative shell: it handles all concrete decisions, side effects,
 and dependency wiring. It parses arguments, loads configurations, sets up
@@ -16,7 +16,7 @@ from aletk.utils import get_logger, lginf, remove_extra_whitespace
 from pydantic import BaseModel
 from philoch_bib_sdk.adapters.tabular_data.read_journal_volume_number_index import ColumnNames
 
-from philoch_bib_enhancer.adapters.raw_web_text import raw_web_text_gateway
+from philoch_bib_enhancer.adapters.raw_text import raw_text_gateway
 from philoch_bib_enhancer.ports.llm_service import LLMService
 
 # Reuse CSV writer from Crossref CLI
@@ -222,8 +222,8 @@ def cli() -> None:
     llm_service = setup_llm_service(env_config)
     lgr.info(f"Using LLM service: {env_config.LLM_SERVICE}")
 
-    rw_gtw_cfg = raw_web_text_gateway.RawWebTextGatewayConfig(llm_service=llm_service)
-    rw_gtw = raw_web_text_gateway.configure(rw_gtw_cfg)
+    rw_gtw_cfg = raw_text_gateway.RawTextGatewayConfig(llm_service=llm_service)
+    rw_gtw = raw_text_gateway.configure(rw_gtw_cfg)
 
     # === CREATE BIBKEY MATCHER IF NEEDED ===
     bibkey_matcher = None
