@@ -18,7 +18,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.dependencies]
 aletk = "^0.1.6"
-philoch-bib-sdk = "^0.1.5"
+philoch-bib-sdk = "^0.2.0"
 attrs = "^25.3.0"
 pydantic = "^2.10.6"
 polars = "^1.26.0"
@@ -61,6 +61,8 @@ module = [
     "anthropic",
     "openai",
     "requests",
+    "pymupdf",
+    "PyPDF2",
 ]
 ignore_missing_imports = true
 
