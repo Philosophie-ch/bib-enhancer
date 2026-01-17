@@ -20,6 +20,7 @@ class RawTextBibitem(BaseModel):
     type: Optional[str] = None  # e.g., "article", "book", "chapter", "inbook", "incollection"
     title: Optional[str] = None
     year: Optional[int] = None
+    pubstate: Optional[str] = None  # Publication state: "forthcoming", "inpress", "inpreparation", "submitted"
     authors: Optional[list[RawTextAuthor]] = Field(default_factory=list)
     editors: Optional[list[RawTextAuthor]] = Field(default_factory=list)
     journal: Optional[str] = None
