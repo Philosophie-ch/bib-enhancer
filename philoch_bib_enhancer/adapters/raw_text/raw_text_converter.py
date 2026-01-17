@@ -2,8 +2,9 @@
 Converter from RawTextBibitem (LLM-extracted data) to BibItem.
 """
 
-from typing import Tuple, Literal
+from typing import Tuple, Literal, cast
 from philoch_bib_sdk.logic.models import BibItem
+from philoch_bib_sdk.logic.literals import TBibTeXEntryType, TPubState
 from philoch_bib_sdk.logic.default_models import (
     AuthorArgs,
     BibStringArgs,
@@ -87,8 +88,10 @@ def _convert_raw_text_bibitem_to_bibitem(raw_bibitem: RawTextBibitem) -> BibItem
 
     # Build BibItem
     bibitem_data: BibItemArgs = {
+        "entry_type": cast(TBibTeXEntryType, raw_bibitem.type or "UNKNOWN"),
         "author": authors,
         "date": date_parts,
+        "pubstate": cast(TPubState, raw_bibitem.pubstate or ""),
         "title": title,
         "volume": raw_bibitem.volume or "",
         "number": raw_bibitem.issue_number or "",

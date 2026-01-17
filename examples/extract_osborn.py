@@ -3,7 +3,7 @@
 
 from pathlib import Path
 from pypdf import PdfReader
-from philoch_bib_enhancer.adapters.raw_text.extractors.parse_pdf_bibliography import (
+from examples.parse_pdf_bibliography import (
     parse_bibliography_file,
     append_to_csv,
 )

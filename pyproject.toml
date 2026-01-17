@@ -27,6 +27,8 @@ libgen-api = "^1.0.1"
 tenacity = "^9.0.0"
 requests = "^2.32.3"
 fastexcel = "^0.14.0"
+pymupdf = "^1.26.7"
+pypdf2 = "^3.0.1"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.5"
