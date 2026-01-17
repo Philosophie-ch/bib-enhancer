@@ -1,0 +1,837 @@
+1 
+ 
+Subjects Simply Sum into Subjects 
+Abstract: The view that constitutive panpsychism faces a subject combination problem is rooted 
+in the ‘Jamesian’ intuition: the intuition that multiple subjects do not simply sum into a greater, 
+composite subject. Most commentators on the subject combination problem  seem to take the 
+Jamesian intuition as an unbudgeable psychological given. This has led to the popularity of 
+emergentist and ‘bonding’ solutions. But emergentist solutions face the same sorts of issue as 
+physicalist emergentism, while bonding solutions are ad hoc and mysterian. Therefore I propose 
+we backtrack, and reexamine how unbudgeable the Jamesian intuition really is. A thin conception 
+of subjects, adumbrated here, permits us to build a positive conception of subjects summing into 
+subjects. There is a number of arguments purporting to show why this sort of pursuit is futile, 
+effectively defending the Jamesian intuition, but I argue that they fail. I also include a critique of 
+the transparency of subjectivity, a principle which has been used to legitim ate anti-subject-
+summing intuitions. By renouncing the Jamesian intuition we clear the way to accepting a 
+metaphysical position according to which subjects really do sum into subjects. This dissolves the 
+subject combination problem, effectively sparing con stitutive panpsychism from what is 
+generally regarded to be its most troublesome issue. 
+ 
+1 INTRODUCTION 
+Of all the versions of the combination problem for panpsychism, the subject combination 
+problem is the most mulled-over, and seems to be regarded as the most formidable. It asks, 
+roughly, how subjects come together to make greater subjects.  The appearance of a problem 
+is rooted in the ‘Jamesian’ intuition: the intuition that  subjects do not simply sum into 
+subjects. Most commentators on the subject combination problem  seem to treat the Jamesian 
+intuition as unbudgeable and ubiquitous (Goff 2009a, 2006, 2016; Coleman 2014; Seager 
+2010; Dainton 2011; Chalmers 2016; Mørch 2018). Even philosophers looking favourably on 
+the view that subject-summing does in fact occur have tended to concede that the facts must 
+therefore clash with intuition, in that respect (Goff 2016; Chalmers 2016). More recently, 
+however, Luke Roelofs has made a few cautious steps towards denying feeling the Jamesian 
+intuition particularly strongly (Roelofs 2019, especially Ch. 3). In this paper I’d like to add 
+my voice alongside Roelofs’s. Although I can conjure up the Jamesian intuition, it is not my 
+prevailing intuition. Not these days, at any rate. After a few years thinking about these topics, 
+my prevailing intuition has become, in the relevant respect, ‘non -Jamesian’: I conceive of 
+subjects as summing into subjects. The significance of being in this position is that I can 
+2 
+ 
+easily accept the view that subjects do in fact sum into subjects (because it doesn’t clash with 
+my intuition), which means that I don’t encounter a serious problem of subject combination. 
+Of course, it’s not very helpful just to declare that my intuition is such that I don’t encounter 
+the subject combination problem. If I want to persuade others not to worry, I need somehow 
+to incite in them a good-faith renunciation of the Jamesian intuiti on. Metaphysical intuitions 
+are not easily undone. Poetry , meditation, time spent on mountaintops —these might be better 
+suited to the task than philosophy. But anything I can offer in the service of what will 
+hopefully prove to be a growing philosophical l iterature on non-Jamesian perspectives is 
+worth offering, I think. 
+Let me begin with a quick introduction to panpsychism and the subject combination problem, 
+before surveying the popular responses, what motivates them, and what challenges they face. 
+This is a good way to stake out my metaphysical position, and to see how it relates to the 
+Jamesian intuition. 
+2 THE SUBJECT COMBINATION PROBLEM 
+Panpsychism is a family of theories that makes consciousness ubiquitous, in one way or 
+another. Most panpsychists say that consciousness exists first of all in entities of the very 
+small, multiply instantiated kind (e.g. subatomic particles), and derivativ ely in middle-size 
+entities like people; this is sometimes called ‘micropsychism.’ Others suggest that subjective 
+consciousness exists first of all in the one big entity, the cosmos, and then derivatively in 
+entities like people; this is sometimes called ‘ cosmopsychism’ (e.g. Goff 2019). For the 
+purposes of this discussion I’ll just focus on micropsychism (which I’ll call ‘panpsychism’), 
+but it bears mentioning that the view I am developing is compatible with micropsychism and 
+cosmopsychism.  
+3 
+ 
+Where microsubjects are the subjects associated with the consciousness of very small entities 
+like subatomic particles, and macrosubjects are subjects that common sense associates with 
+middle-size entities like people, the subject combination problem is broadly the problem o f 
+accounting for the relation between microsubjects and macrosubjects. Chalmers (2016), and 
+the literature generally, distinguishes between constitutive and nonconstitutive solutions to 
+the subject combination problem. A constitutive solution states that t he difference between 
+microsubjects and macrosubjects amounts to a difference in descriptive level, where there is 
+no ontological distinction. A nonconstitutive solution states that the distinction between 
+macrosubjects and microsubjects is ontological: macrosubjects are new entities, on this view, 
+over and above the microsubjects that have in some sense produced them. This is a kind of 
+strong emergentism about subjects (see McLaughlin 1992; Strawson 2006).  
+The nonconstitutive solution (e.g. Seager 2010; Mørch 2018) faces one main problem. To 
+explain why and when macrosubjects emerge on this account, one must apparently postulate 
+special inter-ordinal natural laws governing the appearance of new subjects. But,  as Coleman 
+(2014) argues, the need to postulate such laws would undermine the appeal of panpsychism, 
+to which many (I included) have turned in the interest of escaping the inter-ordinal natural 
+laws required by physicalist strong emergentism. 
+As for the constitutive solutions, I would distinguish between relational and nonrelational 
+variants. The relational constitutive solution introduces some kind of relation into which 
+microsubjects must enter if they are to constitute a macrosubject.  Once related in the right 
+way, microsubjects ‘bond’ (Goff 2009a, p. 132, 2016, §5), enabling otherwise separately 
+experienced qualities to be co-experienced.  
+Under the banner of ‘relational’ constitutive solutions I am placing synchronic and diachronic 
+accounts of subject formation ( solutions that Chalmers and Goff tend to separate by kind). I 
+4 
+ 
+deemphasise this distinction for brevity, and because I want to emphasise  what both accounts 
+share in rejecting, namely the claim  that subject combination requires nothing more than the 
+sheer coexistence of microsubjects. This is the claim of the nonrelational constitutive 
+solution. The nonrelational constitutive solution states that microsubjects simply sum into 
+macrosubjects, regardless of their relationship to one another. On this view, it proceeds from 
+the nature of subjectivity itself that any two or m ore subjects is a subject. This is the solution 
+which I prefer, and which I’ll be pursuing here . 
+The chief problem with the nonrelational constitutive solution is this: the notion that subjects 
+sum into subjects presents a problem of intelligibility. Of course, it is an axiom of orthodox 
+mereology that subjects sum, tout court. If, for instance, there is the Adam -subject and the 
+Eve-subject, classical mereology tells us that there is an Adam -subject-and-Eve-subject. 
+(Certainly one could dispute classical mereology, but I won’t dispute it here because I don’t 
+believe it gets near the heart of the issue (cf. Goff 2016).) But it seems like quite another 
+thing to say that subjects sum into things that are themselves subjects . It is very difficult to 
+see why it should follow solely from the existence of the Adam -subject and the Eve-subject 
+that there is an Adam-and-Eve-subject. This claim—that we cannot make sense of subjects 
+summing into subjects —is frequently made and rarely challenged. William James stated it 
+most famously: 
+… Take a sentence of a dozen words, and take twelve men and tell to each one word. Then 
+stand the men in a row or jam them in a bunch, and let each think of his word as intently as he 
+will; nowhere will there be a consciousness of the whole sentence. We talk of the ‘spirit of the 
+age,’ and the ‘sentiment of the people,’ and in various ways we hypostatize ‘public opinion.’ 
+But we know this to be symbolic speech, and never dream that the spirit, opinion, sentiment, 
+etc., constitute a consciousness other than, and additional to, that of the several individuals 
+5 
+ 
+whom the words ‘age,’ ‘people,’ or ‘public’ denote. The private minds do not agglomerate 
+into a higher compound mind. (James 1890, p. 160) 
+With typical style James evokes the problem . The intuition expressed here is what I’m calling 
+the ‘Jamesian’ intuition. See how Goff concurs: 
+Subjects of experience are just not the kind of things that could intelligibly join together to 
+form ‘bigger’ subjects of experience, any more than non-experiential things are the kind of 
+things that can intelligibly come together to form subjects of experience. (Goff 2006, p. 59) 
+And how Coleman underscores: 
+Subjects being essentially discrete, pre-existing subjects can make no intelligible contribution 
+to the unified subjectivity of a subject they generate in respect of their (the predecessors’) 
+subjectivities. The end subject’s unity is precisely in the most direct defiance of the diversity 
+and mutual ontological independence of the antecedents, which is what their being a set of 
+subjects (at least partly) consists in. (Coleman 2014, p. 36) 
+Again, this is the world of thought in which there is an intelligibility problem for the 
+nonrelational constitutive solution, and which I want to exit (or, better, never to enter). But I 
+dwell on it here to show how it is implicated in the popularity of th e relational constitutive 
+solution. The nonrelational constitutive solution with its intelligibility problem and the 
+nonconstitutive solution with its requirement of inter -ordinal laws—together these seem to 
+form, by most panpsychists’ lights, a Scylla and  Charybdis between which the relational 
+constitutive solution presents the only safe course . As mentioned, this style of solution relies 
+on special relations into which microsubjects must enter in order for a macrosubject  to obtain. 
+All proponents of the relational constitutive solution, however, face the same problem. 1 They 
+ 
+1 Roelofs in 2019 might present an exception, here. In Combining Minds Roelofs offers (1) a relational 
+constitutive solution according to which subjective co-consciousness is the deep nature of ‘one or more of the 
+fundamental physical relations’ (p. 91), which is supplemented with (2) an attempt to make subject-summing a 
+priori graspable. Prima facie (1) and (2) fit together because the physical relations Roelofs has in mind are just 
+6 
+ 
+postulate an intelligible link between microsubjects and macrosubjects without in fact 
+providing one. By this I mean that an intelligible link between microsubjects and 
+macrosubjects, of the kind that is supposedly realised by special relations between 
+microsubjects, has simply never been laid bare for the reader. Goff even maintains that, even 
+though there is a link between microsubjects and macrosubjects that would be intelligible to a 
+notional God, its nature is also unknowable, in principle, to us. Thus  Goff resigns to ‘a kind 
+of mysterianism’ (Goff 2016 , p. 294) on this score. 
+It is certainly better to postulate intelligible links than to postulate unintelligible links. But, 
+other things being equal, it is better to provide intelligible links  than simply to postulate them . 
+In particular, if we can overcome the intelligibility problem for nonrelational constitutive 
+panpsychism, we should prefer that solution over the vaguely mysterian alternatives currently 
+on the market. 
+I think we can overcome the intelligibility problem. There is a certain way of viewing things 
+that makes subject-summing intelligible. The upshot is that we should support a nonrelational 
+constitutive solution. This solution, to recap, is distinctly uncomplicated: there are no truly 
+novel emergent subjects and no inter -ordinal laws, microsubjects do not form macrosubjects 
+in virtue of bonding, and they needn’t be in any special relation to one another (unless 
+coexistence counts). Microsubjects simply sum in to macrosubjects. All they need to do is 
+exist, and there you have it. 
+ 
+about ubiquitous, just as subjects would be if subjects simply sum into subjects (see Goff 2016). My reply to 
+Roelofs is that (2), if successful, makes (1) explanatorily redundant, so that adopting the nonrelational 
+constitutive solution becomes the better choice. In fact, however, Roelofs seems unconfident that (2) is 
+successful; he hastens to make theoretical allowances for the prospect that subject combination is a posteriori 
+(p. 113–119).  
+7 
+ 
+3 TOWARDS A POSITIVE CONCEPTION OF SUBJECT-SUMMING 
+The intelligibility problem facing the nonrelational constitutive solution is driven by the 
+Jamesian intuition. As we have seen, this is a widespread intuition. Coleman ( 2012, p. 138, 
+2014, p. 26), Chalmers (2016, p. 179) and Goff (2006, p.54, 2009a, p. 130) all appeal to 
+James explicitly, and the same intuition is entertained favourably by Dainton (2011). It is 
+detectable outside panpsychist conversations, too. Lowe (1996, p. 39) and Merricks (2001, p. 
+111) invoke something comparable; Block’s (1978) ‘China  brain’ argument against 
+functionalism rests on the presumed absurdity of entities that are already subjects composing 
+a greater subject; and the Jamesian intuition is even detectable in the Integrated Information 
+Theory: Tononi, et al.’s (2014) ‘exclusion’ postulate, which states that ‘at any given time 
+there is only one experience having its full content, rather than a superposition of multiple 
+partial experiences,’ is supposed to follow from a priori phenomenological axioms. 2   
+I think it is the entrenchment of the Jamesian intuition that keeps people from acknowledging 
+alternative intuitional systems, rather than the absence of alternatives. Therefore my main 
+concern here will be to dismantle some of the thought processes propping up the Jamesian 
+intuition. Nonetheless, to coordinate that discussion I must first describe how I think a 
+positive conception of subject -summing, a non-Jamesian intuition, should look. I will keep 
+this brief, and I certainly don’t expect to incite a eur eka moment in my readers. But it will be 
+enough if I can point out the main components of this conception and show where they fit 
+together. After that, I will take up the main, deconstructive task.  
+ 
+2 See Mørch (2018) for lucid discussion of the connection between panpsychism and the Integrated Information 
+Theory, with an emphasis on the exclusion postulate. 
+8 
+ 
+3.1 Thin Subjects 
+There may be many ways to flesh out a non-Jamesian intuition. Annaka Harris (2021), for 
+instance, endorses an attitude of eliminativism about subjects , inspired by the sense of 
+egolessness associated with many meditative practices. But let me advance just one way of 
+thinking, the way I tend to think. What I have in mind is something along the lines of what 
+Galen Strawson (2003) has called ‘thin’ subjects. Maybe we can get closer to the idea of thin 
+subjects by flying by some thicker alternatives. Strawson mentions the following 
+conceptions: 
+[A] The whole-creature conception dominant in present -day analytic philosophy and 
+experimental psychology. 
+E.g., the 5'5" subject who coveted emperorship of France. ‘Subject’ in this sense is often 
+interchanged with ‘participant’ in experimental writeups. And:  
+[B] The traditional inner conception according to which a subject of experience is an 
+inner being or presence of some sort.  
+E.g., Cartesian egos on a standard exegesis of Descartes. [B]-subjects are often called upon to 
+explain why separate experiences can all feel as though they are ‘mine.’  For this to work, [B]-
+subjects and experiential contents must be nonidentical (or else, by transitivity, those 
+‘separate’ experiences would be identical) . 
+Strawson continues, ‘I’ll take it that [A] and [B] both build in the assumption that a subject 
+may, and standardly does, continue to exist even when it is not having any experience ’ (2003, 
+p. 283). Human creatures can persist during dreamless sleep  and anaesthesia. This is also 
+conceivable of subjects on the traditional inner conception, if they are distinct from their 
+experiences. But if we get rid of the detail of persistence we begin to carve out an intelligible 
+place for: 
+9 
+ 
+[C] The thin conception according to which a subject of experience is an inner thing of 
+some sort that does not and cannot exist at any given time unless it is having an 
+experience at that time. 
+If it is true that experience starts when you wake up in the morning and ceases a few minutes 
+after you put your head down in the evening, then a thin subject (though not necessarily the 
+same one) enters and exits existence at the same points. So thin subjects  may fragment across 
+a lifetime. They may be too fragmented to track against a more or less standard notion of 
+persons, but just this needn’t touch on their intelligibility.  
+Of course, a conceptual distinction between subjects that do and don’t persist without 
+experience doesn’t in itself suggest a real distinction. (For all that has been said so far, thin 
+subjects might just be thick-subjects-during-waking-consciousness, for instance.) So there is 
+more work to be done before we reach a notion of thin subjects that really sets them apart.  
+The way to do this requires us to contemplate the character of experien tial content. Take an 
+experience of pain. Reflecting, I find that a pain is already, in itself, an I-have-pain. For this 
+reason, although I can imagine a pain in a way that conceptually isolates it from a subject in 
+the [A] or the [B] sense (again, subjects in this sense are regarded as nonidentical to their 
+experiences), I cannot imagine a pain in a way that utterly rids it of some kind of recipient, 
+some kind of presence, some kind of ‘me,’ for which the pain is indeed painful. Again, 
+speaking phenomenologically,  this ‘me’ does not seem to be ontologically distinct from the 
+pain, itself.  
+I’m trying to bring to mind the idea that a subject and an experiential quality are identical 
+with one another, and with the unitary experience itself . This is what I intend the hyphens to 
+communicate when I write that an experience of a pain is already an I-have-pain. From now 
+on, ‘experience’ in my dictionary means such a unit. ‘Subject,’ meanwhile, refers to an 
+10 
+ 
+experience in a way that emphasises its subjective aspect. It is still possible to talk of 
+subjects, in other words. But we need to keep in mind that what distinguishes ‘subject’ and 
+‘experience’ are their modes of presentation, not their referents.  Thus the ‘inner thing’ which 
+a subject is, according to [C], is a particular, concrete experience.  
+In broad strokes, that’s how I think we should be thinking about subjects before approaching 
+subject combination. But let me attend to a concern that begins to enter around now. 
+Prescient readers might worry that by shifting to this ‘thin’ conception of subjects I have 
+ceased talking about what people who grapple with the combination problem are talking 
+about. This would be because thin subjects do not fix many of the interesting properties 
+standardly associated with subjects, such as personhood, self-consciousness, intelligence, and 
+identity over time. 
+But I think a concept of subjects with so little baggage is precisely what a panpsychist needs 
+while dealing with the subject combination problem. After all, most panpsychists would 
+agree that microsubjects lack many or most of these interesting properties. (If there is one 
+thing panpsychists can agree on, it is that when someone like Simons ridicules them for 
+positing ‘photons with existential angst’ (2006, p. 146) he is attacking a straw man. ) On the 
+other hand, there might be beings at the macro -level to which we want to attribute some basic 
+subjectivity, but which lack the interesting further properties, such as humans with certain 
+cognitive handicaps, and certain nonhuman animals. Therefore, an account of subject 
+combination whose concept of subjectivity already has the interesting further properties built 
+in would risk positing too much, at both the micro- and the macro-level. 
+A better way forward is to treat personhood, self-consciousness, etc. as contingent 
+elaborations upon subjectivity in its basic form. The task of explaining these properties can 
+then be carried out in a separate discussion, presumably in a way that makes recourse to the 
+11 
+ 
+distinctive features of the places where they do arise . For example, if we want to explain the 
+presence of personhood , self-consciousness, intelligence and identity over time in 
+unhandicapped humans, this explanation can incorporate the memorial and cognitive 
+facilities distinctive of unhandicapped humans.  This is beyond our current scope, but it is  an 
+important complementary project.  
+3.2 Thin Subjectivity and Subject Combination 
+I have been unpacking the thin conception of subjectivity on the promise that it aids in our 
+efforts to intuit subject-summing. Now I’ll try to describe the link. There are many properties 
+of which the following is false: for any two or more things that ha ve property p, their sum has 
+p. Two or more things with the property of being an organism do not automatically make 
+something with the property of being an organism, for instance. But there are other properties 
+which are not like this. Take physicality, for instance. For any two or more things with the 
+property of being physical, their sum has the property of bein g physical. Likewise being 
+made of atoms, being made of clay, etc. Call properties like this ‘scale -invariant,’ as they are 
+invariant across different scales of mereological description. What the examples just given 
+happen to share is that they are all ‘su bstantive’ properties as well—I mean, they are 
+properties designating the kind of stuff out of which something is made. By all means, not all 
+scale-invariant properties are substantive. (Take the property of being bigger than Belgium.) 
+But I think I may conjecture that all substantive properties are scale -invariant, as there seems 
+to be something special about substantivity from which scale -invariance flows. In particular, 
+it is in the nature of substantive properties to subserve, and t hus survive, the kind of property-
+variation that does occur when things get summed (e.g. the shift from organism to non -
+organism).   
+12 
+ 
+On a thin, [C]-type conception, being a subject is like being physical inasmuch as ‘being a 
+subject’ means being made out of a certain kind of stuff, in this instance insoluble subject -
+quality stuff. Being a subject is substantive. So we shouldn’t be shocked if being a subject 
+also begins to seem like the kind of property that is scale-invariant. And, if we can see why 
+being a subject is scale-invariant, we can see why subjects sum into subjects. 3 
+That was some pretty slapdash metaphysics, but I am trying to adumbrate an intuition, here, 
+not to construct an argument. Let me put everything back in context. Return to James’s 
+thought experiment. James asks us to imagine an array of twelve men, every ma n thinking 
+one word from a twelve-word sentence. 
+(a) This sentence comprises twelve different words, so it provides a convenient example . 
+Let (a) be distributed among the men, so that one thinks ‘ this,’ another thinks ‘sentence,’ and 
+so on. James denies that in a case like this there is a consciousness of  the whole sentence. If 
+this can be taken to show that  subjects do not sum into subjects , the following had better be 
+true: subject-summing implies that there would be a consciousness of the whole sentence. 
+This may be misleading. Subject-summing does not imply that there would be a subject with 
+the cognitive facility to tie the dozen words together according to the rules of English syntax. 
+So subject-summing does not imply that there w ould be conscious experience remotely like 
+the one you had when you read (a). Nonetheless, the argument will work if we take James to 
+mean ‘sentence’ in a very liberal way, denoting something very sheer: just a nonsequential, 
+nonsyntactical, nonsensical set of word -experiences. It is difficult to form a positi ve 
+ 
+3 Roelofs (2019, p. 84) runs a similar line of thought in relation to ‘primitive’ properties instead of ‘substantive’ 
+properties. A primitive property is ‘a property, the most revealing concept of which … cannot be defined in 
+terms of any other concepts, except those that are reciprocally definitionally dependent on it.’ I choose to focus 
+on substantive properties because I think they make for a more powerful intuition pump. It also bears 
+mentioning that primitive properties and substantive properties are not the same. For instance, spatiality is 
+primitive, but not substantive. 
+13 
+ 
+conception, here, but telescoping (a) into a nonsequential, nonsyntactical, nonsensical set of 
+symbols is at least a step in the right direction:  
+(b)  
+I think (b) represents something closer to what the consciousness of the whole sentence is 
+like. Using ‘sentence’ in this sense, it is right that subject-summing implies that there is a 
+consciousness of the whole sentence. But then I find it pretty intuitive that there should be a 
+consciousness of the whole sentence . First I imagine a dozen word -experiences (made of 
+subject-quality stuff), and then I imagine one (b) -like experience (made of subject -quality 
+stuff). This is a subtle attentional shift, like the one I make when I shift between imagining an 
+array of tesserae and imagining the self -same mosaic. 
+I haven’t made the comparison with the mosaic simply because it ought to hold, according to 
+my theory. The comparison is phenomenologically grounded. When I shift between  
+imagining the twelve experiences and imagi ning the one ‘big’ experience, it really feels to me 
+as though all I am doing is summation; it feels the way it feels when I shift my attention from 
+the tesserae to the mosaic. So I believe I do have a positive conception of subject -summing. 
+3.3 Universalism and Quality Combination 
+Before moving on, I’d like to flag a few implications of my position . Firstly, let me come 
+clean on one very surprising consequence of subject -summing. Going without special 
+conditions for subject combination  means that, for any (any) two or more subjects, their sum 
+is a subject. Goff (2016, §7) calls this ‘unrestricted phenomenal composition,’ or  
+‘universalism’ (see also Frankish 2021; Roelofs 2019). In conjunction with the panpsychist 
+thesis that every microscopic entity is a subject , universalism implies that every concrete 
+thing, without restriction, is a subject. Thus strange fusions, such as the sum of Neptune  and 
+This 
+so 
+twelve 
+comprises 
+sentence 
+words 
+it 
+provides 
+a 
+convenient 
+example 
+14 
+ 
+my nose, are subjects. So are gerrymandered things,  such as my nose minus such-and-such an 
+atom near its tip. Even the sum of everything,  the cosmos, is a subject.4 
+‘Familiar’ subjects—subjects whose existence we readily acknowledge, like you and me —
+also exist, according to universalism, but that’s because they count among every concrete 
+thing, without restriction. They are not exceptional in respect of being subjects. Universalism 
+therefore reframes part of the panpsychist research programme. Assuming universalism, we 
+no longer face the metaphysical task of explaining what makes familiar subjects exceptional 
+in respect of being subjects. In its place, there is the broadly episte mological task of 
+explaining what makes them exceptional in respect of being  ‘familiar.’ Thus our basic 
+situation becomes like the situation in classical mereology, where philosophers who accept 
+universalism about objects (for any two or more objects, their sum is an object) account for a 
+folk practice of restricted quantification  over objects (see Lewis 1986, p. 213; Korman 2007; 
+Hirsch 2002, p. 111–2; Markosian 2008, §3). However, the rules according to which  the folk 
+quantify over subjects are obviously going to be different. Appealing to the special cognitive 
+or memorial facilities of human subjects may again prove fruitful, here. There is a related 
+appeal to be made to the functional integrity of human and nonhuman animals, and in §4.1 
+I’ll have occasion to explore this a bit . But a truly devoted discussion will have to take place 
+elsewhere. 
+Secondly, the thin conception of subjectivity implies that, if subjects constitute subjects under 
+no special relational conditions, so also qualities constitute qualities under no special 
+relational conditions. After all, according to the thin conception, ‘subject’ and ‘quality’ are 
+just different ways of talking about  the same unitary properties. So the case of the twelve -
+ 
+4 This does not bring us all the way to Goff’s (2019) cosmopsychism, which is also paired with a form of 
+priority monism (see Schaffer 2010), so that the cosmosubject is said to ground the smaller subjects within it. I 
+don’t currently wish to take a stand on the direction of grounding (if there is such a thing).  
+15 
+ 
+word sentence, for example, is no more a case of nonrelational constitutive subject 
+combination than it is a case of nonrelational constitutive quality combination. And this 
+feature of my view forces me in a certain direction for solving  panpsychism’s ‘quality 
+combination problem’ (Chalmers 2016). However, it does not mean that—implausibly—
+appealing to nonrelational constitutive quality combination and nothing else is sufficient for a 
+solution. Nonrelational constitutive quality combination is more like a stage setting.  
+Take, for example, the aspect of the quality combination problem known as the ‘palette’ 
+problem. The palette problem asks how we should account for the astonishing range of 
+complex macroqualities—qualities like those experienced by humans —when, according to 
+panpsychism, they are composed of only a handful of different kinds of microqualities —
+simple qualities like those experienced by quarks. One possible route, here, is to pair 
+nonrelational constitutive quality combination with the kind of Russellian panps ychism 
+advanced by Mørch (2019), according to which qualities are the ‘interior’ grounds of 
+(physico-)functional properties. This way, if there are coherent stories to be told about  how 
+an astonishing range of complex functional properties can be constituted by a handful of very 
+basic functional properties, then there should be corresponding ‘interior’ stories to be told 
+about how an astonishing range of complex macroqualities can be constituted by a handful of 
+microqualities. The former will use the language of function, the latter will use the language 
+of qualities, but they will elucidate the same structure from top to bottom.   
+Of course, we don’t actually have the full functional story in relation to the human brains, so 
+we can’t even begin to tell an ‘interior’ story about how microqualities make up human 
+macroqualities. But getting complex functional properties from a handful of very basic 
+functional properties is not, in principle, mysterious. Even the astonishing functional 
+16 
+ 
+properties of an AI interface can be traced, without residue, to an array of simple functional 
+properties, e.g. Boolean operators, at the level of the basic code.5 
+Another aspect of the quality combination problem is known as the ‘ grain’ problem. The 
+grain problem asks how we should account for the non -particulate or ‘smooth’ nature of 
+macroqualities when, according to panpsychism,  they are composed of trillions of 
+microqualities, and are thus particulate or ‘grainy.’ One possible route, here, is to pair 
+nonrelational constitutive quality combination with something like Roelofs’s (2020) 
+‘confusion’ thesis, which proposes that macroqualities are in fact particulate, but that they 
+appear non-particulate when we introspect because the introspective process ‘confuses’ their 
+microqualitative components, presenting them en masse rather than individually. Crucially, 
+by attributing the non-particulateness of macroqualities to limited introspective acuity, we 
+can avoid attributing it to ‘fusing’ or ‘bonding’ among the microqualities, themselves. Recall 
+that avoiding such notions was a major motivator for the nonrelational constitutive solution, 
+in the first place. 
+4 DISMANTLING THE JAMESIAN INTUITION 
+Having said a few words about the positive components of my thinking and shown where 
+they fit together, I want to get to the matter of dismantling the Jamesian intuition. I will offer 
+a number of separate remarks, to this end. On the whole, I will proceed by raising an 
+argument in support of the view that subjects do not sum into subjects, then show where I 
+think it errs. Of course, this is not quite the same as dismantling the intuition that subjects do 
+not sum into subjects. But it comes to the same thing in as much as the arguments raised are 
+ 
+5 One might object that coding is not a case of ‘nonrelational’ constitution, because the logic gates to which the 
+simple functional properties belong must be related to one another in a very specific way in order to produce 
+complex functions. But recall that ‘nonrelational’ constitutive quality combination just means that quality 
+combination does not rely on the presence of special relations between constituents; it does not mean that 
+quality combination precludes the presence of special relations between constituents.   
+17 
+ 
+formulations of the intuitions of the people who advance  them. Moreover, I think it is 
+generally true that in philosophy (as in psychotherapy) intuitions about the world can seem 
+more resistant to dialectical untangling  than they really are—particularly to the people who 
+hold them.6 
+4.1 Summation and Telepathy 
+I am saying that the following state of affairs is intelligible: for any two or more subjects of 
+experience, their experiences are combined by a superordinate subject. At once the most 
+enticing and weakest reply presents this state of affairs as a manifest phenomenological 
+falsehood. It is clear—so runs the objection—that, no matter how deeply I sympathise with 
+you, or how closely I smush my face against yours, I don’t experience your pain. I have my 
+feelings, you have yours, and that’s the end of it.7 Barry Dainton argues in a way similar to 
+this. We must accept, he says, that the experiences of distinct subjects are not bound by an 
+overarching subject, because the alternative ‘leads to a result which is obviously very 
+implausible, for the experiences of distinct human subjects —you and me, for instance—are 
+clearly not mutually co-conscious in this manner’ (2011, p. 257). 
+But is this clear? The important thing to remember here is that subject-summing does not 
+entail that I can feel your pain. That sounds like telepathy, not subject -summing. What 
+subject-summing entails is that a composite subject has the experiences of others  along with 
+whatever I am feeling. But I am not the composite subject; I am just myself! So the fact that I 
+do not feel your pain does entail that my experiences and yours are not bound together for a 
+composite subject. It is not in conflict with subject-summing. 
+ 
+6 Thank you to the anonymous commentator who pointed out the prima facie mismatch between philosophical 
+reasoning and the job of dismantling intuitions. 
+7 This objection was put to me by an anonymous commentator. 
+18 
+ 
+I’ve said enough to defuse the objection, but let me put some momentum towards explaining 
+away the Jamesian intuition. It’s not just the case that I don’t have the experiences of the 
+composite subject; it is also true, on the whole, that a composite subject will lack the 
+cognitive integration, motor control, etc. that it would need in order to  issue something 
+recognisable as a report of its subjectivity. This is certainly true of me and you, who do not 
+constitute a functionally integrated organism . And it is also true of most strange fusions  I can 
+think of, such as the sum of Neptune and my nose . And from this point I think we can 
+extrapolate—cautiously, and marking exceptions where they occur —to the following rule: it 
+would still seem as though subjects don’t sum into subjects, even if they did. This is to say 
+that subject-summing is empirically innocuous, even in spite of its universalist consequences . 
+Therefore, to the extent that the Jamesian intuition is empirically based (which Coleman and 
+Goff would certainly push back on —I’ll consider their a priori arguments below), it 
+shouldn’t be given any special weight. 
+4.2 Ignorance 
+Back in 2009, Sam Coleman expressed hope that ‘ the difficulties panpsychism faces … are 
+not metaphysical ones … They are, instead, difficulties of understanding, and of acceptance 
+by philosophers’ (2009, p. 83). Within five years, however, he had come to deny the 
+intelligibility of subject-summing unequivocally: not only is it the case that ‘we cannot see 
+how the combination of micro -subjects could provide for the existence of a macro -subject,’ 
+but ‘we can see how the combination of micro-subjects could not provide for the existence of 
+a macro-subject’ (Coleman 2014, p. 29)! 
+Here is his main argument. Imagine two particles, each of which is its own subject.  ‘One—
+Blue’s—is pervaded by a unitary blueness, the other —Red’s—by redness, and that is all they 
+experience, respectively.’ Let’s also suppose that Red and Blue are mereologically simple. 
+19 
+ 
+Subject-summing implies that there are three subjects in play: Red, Blue, and the über-
+subject, called ‘Ub.’ Coleman writes: 
+To say these points of view [Red’s and Blue’s] were present as components in the experiential 
+perspective of the über-subject (‘Ub’) would … be to say that Ub experienced a unitary 
+phenomenal blueness and a unitary phenomenal redness, i.e. had synchronous experiences as 
+of each of these qualities alone, to the exclusion of all others. For it is these qualities each on 
+their own that characterise, respectively, the perspectives of the original duo. Experience 
+excludes, as well as includes. Yet nowhere does Ub have any such experiences: he precisely 
+combines his predecessors’ qualitative experiential contents. Ub doesn’t experience red-to-
+the-exclusion-of-(blue-and)-all-else, nor blue-to-the-exclusion-of-(red-and)-all-else, let 
+alone—impossibly—both together. Thus the original points of view are not ingredients in 
+Ub’s subjectivity. Only their contents—the redness and blueness—are. (Coleman 2014, p. 33) 
+Coleman is invoking a fairly compelling principle, here. Intuitively, any adequate 
+characterisation of subjective experience must combine two kinds of claim : on the one hand a 
+piece of phenomenological language describing some experience, but on the other an ‘and 
+that’s all’ clause marking the experience’s limit. Subjects are governed by what we might call 
+an Ignorance principle. Ignorance has long been recognised. James put Ignorance 
+persuasively when he wrote that every experience exists ‘shut in its own skin, windowless, 
+ignorant of what the other feelings are and mean ’ (James 1890, p. 160). Gregg Rosenberg too 
+observes that ‘consciousness has inherent boundaries. Only some experiences are part of my 
+consciousness; most experiences in the world are not. Arguably, these boundaries are what 
+individuate me as an experiencing subject in the world ’ (Rosenberg 2004, p. 80). And shrewd 
+Thoreau was aware enough of Ignorance to quip,  ‘I should not talk so much about myself if 
+there were anybody else whom I knew as well. Unfortunately, I am confined to this theme by 
+the narrowness of my experience ’ (Thoreau 1854, p. 7). 
+20 
+ 
+Phrased in relation to subject-summing, Coleman’s argument can be put like this:  
+(1) If subject-summing is possible, Red’s experience and Blue’s experience are 
+components of Ub’s experience. 
+(2) Red’s experience is of red-to-the-exclusion-of-(blue-and)-all-else. 
+(3) Blue’s experience is of blue-to-the-exclusion-of-(red-and)-all-else.  
+(4) If Red’s experience and Blue’s experience are components of Ub’s experience, then 
+Ub’s experience is of red-to-the-exclusion-of-(blue-and)-all-else and blue-to-the-
+exclusion-of-(red-and)-all-else. [(2), (3)] 
+(5) Something cannot have an experience that is of red and to the exclusion of red (nor of 
+blue and to the exclusion of blue).  
+(6) Red’s experience and Blue’s experience are not components of Ub’s experience. [(4), 
+(5)] 
+(7) Subject-summing is impossible. [(1), (6)]  
+Here Ignorance is at work in premises (2) and (3). I’m inclined to think that Ignorance is true, 
+so that Red and Blue do exclude each other’s experiential contents in something like this 
+way. But the argument is still unconvincing. In premise (4) Coleman supposes that the 
+combination of Red and Blue into Ub requires that Ub itself takes on the distinctive properties 
+of its components. But to assume that a whole must take on the properties distinctive of one 
+or more of its proper parts is to commit a fallacy of composition. Take a non-experiential 
+analogue. A tomato plausibly ‘excludes, as well as includes’: a tomato has, to adopt the 
+idiom, the physical propert y of tomato-to-the-exclusion-of-(lettuce-and)-all-else. Equally 
+lettuce has the physical propert y of lettuce-to-the-exclusion-of-(tomato-and)-all-else. But it 
+does not follow that something comprising lettuce and tomato would have to have physical 
+properties which are both of tomato and to the exclusion of tomato. Counterintuitively, that 
+would make salad impossible.  So it seems improper in this context to suppose that the whole 
+21 
+ 
+inherits the physical properties distinctive of its proper parts. Instead, those properties belong 
+just to the parts. And I think the same account is sensible in relation to experiential properties. 
+True enough, blue as such has the experiential property of blue-to-the-exclusion-of-(red-
+and)-all-else and Red as such has the experiential property of red-to-the-exclusion-of-(blue-
+and)-all-else, but we needn’t assume that  Ub as such has either. So the contradiction flagged 
+in (5) never arises.8  
+4.3 Privacy 
+I just considered the principle Ignorance,  according to which any subject is essentially limited 
+to only certain experiences. I accepted Ignorance but denied that it precludes subject -
+summing. It is tempting to add another requirement, similar -seeming but importantly 
+different. Privacy states that any subject essentially enjoys private access to its experiences, 
+free from eavesdropping subjects. Again, this is an idea intimated by Coleman, who gives 
+subjects a ‘private qualitative field’ (Coleman 2014, p. 30). Dainton endorses Privacy more 
+explicitly when he suggests, ‘if an experience e 1 belongs to a subject S1, it belongs ONLY to 
+S1, so e1 cannot also (and simultaneously) belong to a distinct subject S 2’ (Dainton 2014, p. 
+246). And the British Idealist Francis Bradley wrote evocatively on the same idea:  
+My external sensations are no less private to myself than are my thoughts or my feelings. In 
+either case my experience falls within my own circle, a circle closed on the outside; and, with 
+all its elements alike, every sphere is opaque to the others which surround it. … In brief, 
+ 
+8 Note for good measure that it is coherent to hold that the distinctive experiential properties of Red and Blue 
+are not inherited by Ub and yet maintain that subjectivity is scale-invariant. A physical analogy is helpful here, 
+again. A subject deflationist says that the experiential property of red-to-the-exclusion-of-all-else is just a mode 
+of subjective stuff. An analogous position on matter (which I don’t necessarily commit to) makes, e.g., the 
+physical property of tomato-to-the-exclusion-of-(lettuce-and)-all-else a mode of physical stuff. I think it is clear 
+that someone with this view of physical properties could hold that the distinctive physical properties of tomato 
+and lettuce are not inherited by a salad (thus allowing for the possibility of salad) and yet maintain that 
+physicality is scale-invariant. 
+22 
+ 
+regarded as an existence which appears in a soul, the whole world for each is peculiar and 
+private to that soul.9 (Bradley 1893, p. 346) 
+From the essential privacy of subjective experience one could seemingly mount an argument 
+that is stronger than the argument for which Coleman opted, above. For unlike the 
+experiential property that is blue-to-the-exclusion-of-all-else, say, the experiential property 
+that is blue-such-that-nothing-else-experiences-this-blue prevents by force of logic the 
+possibility of Ub. In other words, Privacy is incompatible with subject -summing, because 
+subject-summing entails that subjects have (or, speaking carefully, are) experiential qualities 
+which are encompassed within superordinate subjects, and Privacy denies this possibility.  
+Thankfully, however, I don’t see any strong reason to endorse Privacy. Dainton, Bradley and 
+Coleman alike invoke Privacy without arguing for it; apparently this feature of experience is 
+self-evincing. But is it? Maybe Privacy seems true. But how would we expect things to seem 
+if Privacy were false? Just the same, I think. Try to imagine Privacy suddenly going from true 
+to false, perhaps because a superordinate subject, a subject combining your experiences and 
+mine, suddenly pops into being. I cannot see why this should bring about a change in how 
+things seem to either of us. Instead, we would potter on as ever, obliv ious of our mutual 
+eavesdropper. 
+The situation is a bit like this. Watching the sun rise above the horizon, it is fair to say that 
+geocentrism seems true. But the apparent motion of the sun would be the same if geocentrism 
+were false and heliocentrism were true, instead. Therefore, it would be dialectically impotent 
+for a geocentrist debating a heliocentrist to point out that geocentrism seems true. Equally, 
+Privacy would seem true even if it weren’t . Therefore, it is dialectically impotent for 
+ 
+9 Apparently this passage from Bradley is well known to literary critics (as TS Eliot quotes it in his notes to The 
+Waste Land), by whom it was at one time ‘almost universally misinterpreted’ as an expression of solipsism 
+(Brooker 1979). It probably warrants pointing out, then, that Privacy does not express or entail solipsism, at 
+least ‘hard’ solipsism. There can be many private experiences. 
+23 
+ 
+somebody defending Privacy to point out that Privacy seems true.  So I’m justified not to take 
+invocations of Privacy too seriously.  
+As Goff and Roelofs (2020) point out, t here is a restricted version of Privacy that not only 
+seems true, but is true. Consider human subjects of the medically unexceptional kind (so no 
+split-brain patients, neurologically conjoined twins, etc.). Subjects of this kind are wholly 
+discrete from one another (just as their brains are), without any shared experiences. Therefore 
+even if subject-summing in fact occurs the experiences of regular human subjects remain off -
+limits to others of their kind. If I restrict  the domain to regular human subjects and reread the 
+above passages from Bradley and Dainton, for instance, then everything they say rings true.  
+Hopefully readers who feel reluctant to surrender Privacy find some redress in this restricted 
+version of the principle. But there is also a diagnostic remark  which I would like to moot, 
+here. Plausibly, people who embrace Privacy do so owing to a hasty generalisation from its 
+restricted version. It is easy to see how one’s thoughts could slip from the privacy of regular 
+human subjects into Privacy, the principle concerning subject s as such. To be sure, this move 
+would be an error, since it presupposes that there are not composite subjects which are unlike 
+regular human subjects in precisely the sense that they share experiences with some subject. 
+But we tend to be preoccupied by reg ular human subjects (partly because composite subjects 
+do not self-report, as discussed); so it would be understandable for such an error to occur.    
+4.4 Absence of Conception versus Conception of Absence 
+Goff (2009b) and Chalmers (2016) sometimes express the Jamesian intuition in terms of the 
+conceivability of ‘panpsychist zombies .’ Panpsychist zombies are a spin on ‘regular’ 
+zombies, of the kind that Chalmers (e.g. 2009) famously discusses. Panpsychist zombies are 
+microphysical and microsubjective duplicates of us  (where panpsychism is assumed true)  
+which lack our macrosubjective properties. The panpsychist zombie version of me, for 
+24 
+ 
+instance, enjoys my experiential properties, but only from multiple points of view at once, 
+and not from one all-encompassing point of view. 
+What I have already said about Ignorance and Privacy could be reapplied to explain why 
+some people take panpsychist zombies as conceivable. But I want to take this opportunity to 
+make a new diagnostic offering. It is a familiar point that the consideration of an entity need 
+not grant a priori access to everything that the entity metaphysically entails —not, in any 
+case, ‘1-dimensional’ a priori access, so that we are explicitly aware of those entailments, 
+can codify them in conceivability premises, etc. This  point is particularly familiar where the 
+entailments in question are constitutive facts occupying a lower level of description, for 
+instance the chemical facts of water (see Putnam 1975). But hidden essences, so called, 
+needn’t be literally hidden; they n eed only elude the primary intention of the terms or 
+concepts employed. It seems possible, for instance, that someone unfamiliar with rabbits 
+should see the duck in the duck -rabbit while failing to see the rabbit. Equally, someone who 
+revels in detail could see in a mosaic a thousand interlocking tesserae while failing to 
+recognise the scene that they compose. Likewise it may be possible, even granted a thin 
+conception of subjectivity, to conceive of any group of subjects without conceiving of their 
+sum: to have one’s expectations set to such a level of description that in considering a group 
+of subjects one attends to the many but cannot heed the superordinate subject with which they 
+are collectively identical. And it is easy to see how one could mistake th e absence of the 
+conceptualisation of any macrosubject for the active conceptualisation of any macrosubject’s 
+absence. By this process one might come to the position that panpsychist zombies are 
+conceivable. Clearly, however, if one merely neglects to conc eive of a macrosubject 
+alongside a group of microsubjects, one is not justified to infer that microsubjects do not 
+really constitute macrosubjects. Someone who merely neglects to notice the rabbit in the 
+duck-rabbit, for instance, is not justified to concl ude that the duck does not constitute a rabbit 
+25 
+ 
+(the duck does constitutive a rabbit, after all). So if this is what the conceivability of 
+panpsychist zombies comes to, then the conceivability of panpsychist zombies is compatible 
+with subject-summing.  
+4.5 The Transparency of Subjectivity 
+Another advantage of framing the Jamesian intuition in terms of panpsychist zombies is to set 
+up an instructive analogy with the rich existing literature on regular zombies. For instance, 
+my general position in relation to panpsychist zombies (of which the  comment above is just 
+one articulation) is very similar in form to the position of the ‘ a posteriori physicalist’ in 
+relation to regular zombies. My position is that panpsychist zombies are impossible, but 
+might still be conceivable (perhaps not to everyo ne, but to Goff) owing to some or another 
+conceptual failure.10 Meanwhile, the a posteriori physicalist’s position in relation to regular 
+zombies is that regular zombies are impossible, but still conceivable owing to some or 
+another conceptual failure. Therefore I am vulnerable to a familiar rebuttal. Defenders of the 
+regular zombie argument some times rebut that when it comes to imagining regular zombies 
+we are uncommonly immune to conceptual failure because we have ‘transparent’ access to 
+phenomenal properties, meaning that we enjoy a priori access to their essential natures 
+(Morris 2021; Goff 2017) . Equivalently, Goff (2017, §7.3.2.3) has argued at length that the 
+essence of subjectivity is revealed to us a priori. So it seems likely that at the present juncture 
+Goff would appeal to the transparency of subjectivity. After all, if it is true that one can 
+‘grasp the nature of subjecthood’ (2017 , p. 178), then it must presumably be the case that, 
+when one thinks about subjects, one does not fail to register any facts about how subjects 
+ 
+10 It might seem strange that I admit that Goff finds panpsychist zombies conceivable, rather than saying that he 
+merely mistakes them for conceivable. But in the sense in which Goff uses ‘conceivable,’ a situation is 
+conceivable when an ordinary (as opposed to Godlike) thinker sees no contradiction in it. W ell, Goff is an 
+ordinary thinker in this sense, and I believe that he sees no contradiction in panpsychist zombies.    
+26 
+ 
+combine. And this would mean that imagining an array of subjects while neglecting to 
+imagine their sum (the risk I highlighted above) is an impossibility.  
+I have sympathy for certain forms of transparency principle, provided they are sufficiently 
+cautious. But Goff’s principle is too brash to be plausible. It seems to face an obvious 
+problem. If accessing the essence of subjectivity were so easy, then everybody who thought 
+about subjectivity would reach the same conception of it. But there is demonstrably no such 
+consensus. I have thought about it, and I have arrived at a conception other than Goff’s: I 
+genuinely conceive of subjects summing into  subjects. My conception might be false, but it is  
+truly my conception. Therefore we do not have transparent access to the nature of 
+subjectivity. 
+Goff might reply that the transparency of subjectivity does hold true, but the reason he and I 
+have different conceptions is that one of us  is not actually thinking about subjects. 
+Presumably the accusation falls on me. Maybe, for instance, I’m actually thinking about mere 
+experiential qualities, but the thin conception of subjectivity that I’ve bought into wrongly 
+encourages me to apply the misnomer ‘subject’ to qualities. But there is a problem with this 
+reply, which I can’t see Goff getting around. Surely, if we grasp what subjectivity essentially 
+is, then by inverting its properties we can grasp what subjectivity is  not. In other words, if we 
+know that something is a subject iff it is p, we can determine that something  is not a subject 
+by determining that it is not p. The transparency of subjectivity therefore precludes the 
+possibility of mistaking anything other than a subject for a subject. (Moreover, to r esist this 
+point renders the transparency of subjectivity pretty useless; what good would it do Goff to 
+know that we can access the essence of subjects, if we can’t also be sure when we are looking 
+at subjects?) Goff, then, is forced to accept that he and I are both thinking about subjects. 
+And this means that my original objection to the transparency of subjectivity holds.  
+27 
+ 
+5 CONCLUSION 
+As influential as James’s famous passage has proven, remarkably, he expresses support for 
+panpsychism in the same chapter.  As Skrbina (2005, p. 156) points out, i t was not until later 
+that these conflicting commitments —the intelligibility problem with subject-summing on the 
+one hand, panpsychism on the other —came to blows. The outcome: although he cannot 
+‘logically see how a collective experience of any grade whatever can be treated as logically 
+identical with a lot of distributive experiences ’ (James 1909, p. 83), the manifest fact, given 
+the truth of panpsychism, that subjects do compose new subjects compels him ‘to give up the 
+logic, fairly, squarely, and irrevocably ’ (James 1909, p. 86). 
+Over the course of this paper I’ve tried to sketch out another world of thought: a world in 
+which subject-summing does not present difficulties of intelligibility. Certain traditional ways 
+of thinking about what a subject is pull against this aspiration. Recall , for instance, 
+conception [A], the whole creature conception. It is clear that two whole creatures do not 
+automatically make a whole creature, so subjects conceived in this way clearly do not sum 
+into subjects. Likewise for [B], it seems wrong to sup pose that two Cartesian egos 
+automatically make a Cartesian ego. But a thin conception of subjectivity proves particularly 
+useful. A thin conception makes subjectivity a kind of stuff, similar to physicality, and 
+similarly scale-invariant.  
+Please note that I never intended to reject [A] and [B], but only to draw attention away from 
+them and towards [C]. After all, the claim under contention was that subject -summing is 
+unintelligible, and to deny this it is sufficient that to show that there is one conception of 
+subjects which facilitates the intelligibility of subject -summing; it is unnecessary to show that 
+there are no conceptions that do not.  
+28 
+ 
+I don’t think there is much point trying to get up a positive conception of subject -summing 
+where the Jamesian intuition is already present and waiting to stifle alternatives, so I have 
+made dismantling the Jamesian intuition a primary concern. Again, I tried to maintain a 
+‘diagnostic’ spirit by looking at the thoughts of those who entertain the Jamesian intuition 
+and then working backwards to some or another error or prejudice. ‘Diagnose’ is an awful, 
+patronising word, I know. But my i ntentions have been reconciliatory. My hope is that by 
+digging up the Jamesian intuition, roots and all, we might clear the field for a new crop in 
+which all can share. The fruit envisioned: a ‘ logic’ of subject-summing which does what 
+James’s could not do for him . Contrary to prevailing opinion, I do not think that nonrelational 
+constitutive panpsychism requires us to sacrifice good sense.   
+29 
+ 
+ 
+Block, N. (1978). Troubles with functionalism . Minnesota Studies in the Philosophy of 
+Science, 9, 261–325. 
+Brooker, J. S. (1979). F. H. Bradley’s Doctrine of Experience in T. S. Eliot ’s ‘The Waste 
+Land’ and ‘Four Quartets’”. Modern Philology, 77 (2), 146–57. 
+Chalmers, D. (2009). The Two-Dimensional Argument Against Materialism . In B. 
+McLaughlin (ed.), The Oxford Handbook on the Philosophy of Mind . Oxford: Oxford 
+University Press. 
+Chalmers, D. (2016). The Combination Problem for Panpsychism. In G. Brüntrup & L. 
+Jaskolla (eds), Panpsychism. Oxford University Press. 
+Coleman, S. (2009). Mind under Matter. In D. Skrbina (ed.), Mind that Abides. John 
+Benjamins Publishing Company.  
+Coleman, S. (2012). Mental Chemistry: Combination for Panpsychists . Dialectica, 66 (2), 
+137–66. 
+Coleman, S. (2014). The Real Combination Problem: Panpsychism, Micro -Subjects, and 
+Emergence. Erkenntnis, 79 (1), 19–44. 
+Dainton, B. (2011). Review of Consciousness and its Place in Nature . Philosophy and 
+Phenomenological Research , 83, 238–61. 
+Frankish, K. (2021). Panpsychism and the Depsychologization of Consciousness. Aristotelian 
+Society Supplementary Volume , 95 (1), 50–70. 
+30 
+ 
+Goff, P. & Roelofs, L. (2020). In defence of phenomenal sharing. In L. Bugnon, & M. Nida -
+Rumelin (eds.), The Phenomenology of Self -Awareness and the Nature of Conscious 
+Subjects. Routledge 
+Goff, P. (2006). Experiences Don’t Sum. Journal of Consciousness Studies , 13, 53–61. 
+Goff, P. (2009a.). Can the panpsychist get round the combination problem? In D. Skrbina 
+(ed.), The Mind that Abides: Panpsychism in the New Millennium , Benjamins 
+Publishing. 
+Goff, P. (2009b). Why Panpsychism Doesn’t Help us Explain Consciousness , Dialectica, 63, 
+289–311. 
+Goff, P. (2016). The Phenomenal Bonding Solution to the Combination Problem . In G. 
+Brüntrup and L. Jaskolla (eds.), Panpsychism: Contemporary Perspectives . Oxford: 
+Oxford University Press. 
+Goff, P. (2017). Consciousness and Fundamental Reality. Oxford: Oxford University Press.  
+Goff, P. (2019). Cosmopsychism, Micropsychism, and the Grounding Relation . In W. Seager 
+(ed.), The Routledge Handbook of Panpsychism . Routledge. 
+Harris, A. (2021). A Solution to the Combination Problem and the Future of Panpsychism . 
+Journal of Consciousness Studies , 28 (9–10), 129–40. 
+Hirsch, E. (2002). Against revisionary ontology. Philosophical Topics, 30, 103–127. 
+James, W. (1890 (2007)). The Principles of Psychology , Volume 1. Harvard University Press. 
+James, W. (1909 (2008)). A Pluralistic Universe. Rockville, MD: Arc Manor. 
+31 
+ 
+Korman, D. (2007). Unrestricted Composition and Restricted Quantification . Philosophical 
+Studies, 140 (3), 319–334. 
+Lewis, D. (1986). On the Plurality of Worlds. Malden: Blackwell. 
+Lowe, E. J. (1996). Subjects of Experience . Cambridge, UK: Cambridge University Press. 
+Markosian, N. (2008). Restricted composition. In J. Hawthorne, T. Sider, & D. Zimmerman  
+(eds), Contemporary Debates in Metaphysics. Basil Blackwell. 
+McLaughlin, B. (1992). The Rise and Fall of British Emergentism. In A. Beckermann, H. 
+Flohr & J. Kim (eds), Emergence or Reduction?: Prospects for Nonreductive 
+Physicalism. De Gruyter. 
+Merricks, T. (2001). Objects and Persons. Oxford: Oxford University Press. 
+Mørch, H. H. (2018). Is the Integrated Information Theory of Consciousness Compatible with 
+Russellian Panpsychism? Erkenntnis, 84 (5), 1065–85. 
+Mørch, H.H. (2019). The Argument for Panpsychism from Experience of Causation . In W. 
+Seager (ed.), The Routledge Handbook of Panpsychism  (pp. 269-284). Routledge. 
+Morris, K. (2021). Phenomenal Transparency and the Transparency of subjecthood . Analysis, 
+81, 39–45. 
+Putnam, H. (1975). The Meaning of ‘Meaning’ . In K. Gunderson (ed.), Language, Mind, and 
+Knowledge. Minneapolis: University of Minnesota Press. 
+Roelofs, L. (2019). Combining Minds. NY: Oxford University Press. 
+Roelofs, L. (2020). Consciousness, Revelation, and Confusion. Dialectica, 74 (1), 61–93. 
+32 
+ 
+Rosenberg, G. (2004). A Place for Consciousness . Cambridge: Cambridge University Press. 
+Schaffer, J. (2010). Monism: The Priority of the Whole. Philosophical Review, 119 (1), 31–
+76. 
+Seager, W. (2010). Panpsychism, Aggregation and Combinatorial Infusion . Mind and Matter, 
+8, 167–84. 
+Simons, P. (2006). The Seeds of Experience. In A. Freeman (ed.), Consciousness and its 
+Place in Nature: Does Physicalism Entail Panpsychism?  Imprint Academic. 
+Skrbina, D. (2005). Panpsychism in the West. Cambridge, MA: MIT Press.  
+Strawson, G. (2003). What Is the Relation between an Experience, the Subject of the 
+Experience, and the Content of the Experience? Philosophical Issues, 13, 279–315. 
+Strawson, G. (2006). Realistic Monism: Why Physicalism Entails Panpsychism . Journal of 
+Consciousness Studies , 13 (10–11), 3–31. 
+Thoreau, H. D. (1854 (2016)). Walden. Penguin Books. 
+Tononi, G., Oizumi, M., Albantakis, L. (2014). From the Phenomenology to the Mechanisms 
+of Consciousness: Integrated Information Theory 3.0 . PLOS Computational Biology , 
+10 (5), 10.1371/journal.pcbi.1003588 . 
