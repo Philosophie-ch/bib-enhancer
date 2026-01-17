@@ -277,5 +277,207 @@
       "year_range": "2000-2025"
     },
     "script_location": "philoch_bib_enhancer/adapters/raw_web_text/extractors/folia_unifr_philosophy.py"
+  },
+
+  "file:///*.bib": {
+    "source_type": "BibTeX File",
+    "description": "Extract bibliographic references from BibTeX (.bib) files",
+    "last_extraction": "2025-10-30",
+    "file_characteristics": {
+      "format": "bibtex",
+      "structure": "Structured BibTeX entries with @ entry types",
+      "encoding": "UTF-8",
+      "typical_entry_types": ["@article", "@book", "@incollection", "@thesis", "@phdthesis", "@mastersthesis", "@inproceedings"]
+    },
+    "extraction_method": {
+      "approach": "Direct BibTeX parsing using Python regex and SDK conversion",
+      "library": "Native Python (no bibtexparser dependency)",
+      "steps": [
+        "Read .bib file content",
+        "Split into individual entries using regex pattern: r'\\n@'",
+        "For each entry:",
+        "  - Extract entry type from @type{...} pattern",
+        "  - Extract fields using regex: field = {value} or field = \"value\"",
+        "  - Parse authors: handle 'and' separators, 'Last, First' format",
+        "  - Clean LaTeX formatting: remove {{}} double braces, {} single braces",
+        "  - Handle special characters and accents",
+        "  - Extract pages: handle formats like '123--456', '123-456', '123'",
+        "  - Parse year: handle numeric years and special values like 'forthcoming'",
+        "Create RawTextBibitem objects with all extracted metadata",
+        "Convert to CSV using process_raw_bibitems() from SDK"
+      ],
+      "challenges": [
+        {
+          "issue": "LaTeX brace protection",
+          "description": "BibTeX uses {{Text}} to protect capitalization. Titles had unnecessary braces like '{{Someone}}'",
+          "solution": "Strip all curly braces iteratively: '{{Text}}' -> '{Text}' -> 'Text'"
+        },
+        {
+          "issue": "Entry type format",
+          "description": "Extracted 'article' but CSV writer adds '@' prefix for BibTeX compatibility",
+          "solution": "This is correct behavior - '@article' is the proper BibTeX format in output CSV"
+        },
+        {
+          "issue": "Publication state vs year",
+          "description": "Values like 'forthcoming' and 'no date' mixed with numeric years",
+          "solution": "Added separate 'pubstate' field to RawTextBibitem model. 'forthcoming' goes to pubstate, year stays as Optional[int]"
+        }
+      ],
+      "notes": [
+        "BibTeX files are already structured, so parsing is straightforward",
+        "Main challenge is cleaning LaTeX formatting for plain text output",
+        "SDK's converter handles transformation to BibItem format",
+        "Output CSV maintains BibTeX compatibility with @ prefixes"
+      ]
+    },
+    "output_format": {
+      "method": "process_raw_bibitems()",
+      "format": "CSV with BibTeX-compatible fields"
+    },
+    "sample_entry": {
+      "raw_text": "@article{bagley_loving_2015,\n  title = {Loving {{Someone}} in {{Particular}}},\n  author = {Bagley, Benjamin},\n  year = {2015},\n  journal = {Ethics},\n  volume = {125},\n  number = {2},\n  pages = {477--507},\n  doi = {10.1086/678481}\n}",
+      "type": "article",
+      "title": "Loving Someone in Particular",
+      "year": 2015,
+      "authors": [{"given": "Benjamin", "family": "Bagley"}],
+      "journal": "Ethics",
+      "volume": "125",
+      "issue_number": "2",
+      "start_page": "477",
+      "end_page": "507",
+      "doi": "10.1086/678481"
+    },
+    "data_quality": {
+      "completeness": "Excellent - BibTeX is structured format",
+      "common_fields": ["entry_type", "title", "author", "year", "journal", "volume", "number", "pages", "publisher", "doi"],
+      "cleaning_applied": [
+        "LaTeX brace removal ({{}} and {})",
+        "Page range normalization (-- to --)",
+        "Author name parsing (handles 'and' separators)",
+        "DOI cleaning (remove trailing punctuation)"
+      ]
+    },
+    "script_location": "philoch_bib_enhancer/adapters/raw_text/extractors/extract_bibtex.py",
+    "usage": "python extract_bibtex.py <input.bib> <output.csv>",
+    "example_files": [
+      "data/biblio/biblio-training/new-ones-for-Claude/blumson-joaquin.bib (107 entries)"
+    ]
+  },
+
+  "file:///*.pdf": {
+    "source_type": "PDF File with Bibliography",
+    "description": "Extract bibliographic references from academic PDFs containing reference sections",
+    "last_extraction": "2025-10-30",
+    "file_characteristics": {
+      "format": "pdf",
+      "typical_sources": "Academic papers, theses, dissertations with bibliography sections",
+      "encoding": "UTF-8 (after extraction)",
+      "structure": "Unstructured text with 'References' or 'Bibliography' section"
+    },
+    "extraction_method": {
+      "approach": "PDF text extraction + bibliography section parsing",
+      "library": "pypdf",
+      "steps": [
+        "Extract text from PDF using pypdf library",
+        "Identify bibliography section by looking for markers: 'References', 'Bibliography', 'Works Cited', 'Literature'",
+        "Parse individual entries:",
+        "  - Detect entry boundaries: lines starting with uppercase letter or em-dash + year pattern",
+        "  - Extract year from (YYYY) pattern",
+        "  - Extract title from quoted text or after year",
+        "  - Parse authors: handle 'and' separators, 'Last, First' format, em-dash for 'same author'",
+        "  - Determine entry type: article (has journal), book, incollection (has 'In:')",
+        "  - Extract journal from 'In: Journal vol.issue' pattern",
+        "  - Extract pages from 'pp. start--end' pattern",
+        "  - Extract DOI from 'doi: ...' pattern",
+        "  - Clean OCR artifacts and line-break hyphens",
+        "Create RawTextBibitem objects",
+        "Convert to CSV using process_raw_bibitems() with proper SDK method"
+      ],
+      "challenges": [
+        {
+          "issue": "Curly/typographic quotes",
+          "description": "PDF text had curly quotes (U+201C U+201D) instead of straight quotes, regex didn't match",
+          "solution": "Use Unicode escapes in regex: r'[\\\"\\\\u201C]([^\\\"\\\\u201D]+)[\\\"\\\\u201D]' to handle both types"
+        },
+        {
+          "issue": "Line-break hyphens",
+          "description": "PDF line breaks created broken words: 'Understand- ing', 'Univer- sity'",
+          "solution": "Regex to remove hyphen+space pattern: r'([a-z])-\\s+([a-z])' -> r'\\1\\2'. Preserves real compounds like 'well-known'"
+        },
+        {
+          "issue": "OCR artifacts with accents",
+          "description": "Accented characters split: 'Alchourr´ on' instead of 'Alchourrón', 'G¨ ardenfors' instead of 'Gärdenfors'",
+          "solution": "Replace OCR patterns: '´ o' -> 'ó', '¨ a' -> 'ä', etc. for common accented characters"
+        },
+        {
+          "issue": "DOI trailing punctuation",
+          "description": "DOIs had trailing dots: '10.1007/s10892-005-3508-y.'",
+          "solution": "Strip trailing punctuation from DOI: doi.rstrip('.,')"
+        },
+        {
+          "issue": "Unnecessary quotes in output",
+          "description": "Titles appeared with quotes in CSV even after stripping during parsing",
+          "solution": "The issue was curly quotes not being detected. Once regex was fixed to handle Unicode quotes (\\u201C, \\u201D), titles were properly cleaned"
+        }
+      ],
+      "notes": [
+        "PDF extraction quality depends on PDF quality (OCR vs native text)",
+        "Bibliography format varies by citation style (APA, Chicago, MLA, etc.)",
+        "Current parser handles common academic formats",
+        "Em-dash (—) in bibliography means 'same author as previous entry'",
+        "Line joining during parsing requires careful handling to preserve/remove hyphens correctly"
+      ]
+    },
+    "text_cleaning": {
+      "ocr_fixes": [
+        "´ o -> ó (acute accent)",
+        "¨ a -> ä (umlaut)",
+        "` e -> è (grave accent)",
+        "ˆ o -> ô (circumflex)"
+      ],
+      "line_break_hyphens": {
+        "pattern": "word- continuation",
+        "solution": "Remove hyphen+space when followed by lowercase letter",
+        "preserves": "Real compounds like 'well-known', 'meta-analysis', 'Ben-Zeev'"
+      },
+      "quote_handling": {
+        "straight_quotes": "U+0022",
+        "curly_left": "U+201C",
+        "curly_right": "U+201D",
+        "regex_pattern": "[\\\"\\\\u201C]([^\\\"\\\\u201D]+)[\\\"\\\\u201D]"
+      }
+    },
+    "output_format": {
+      "method": "process_raw_bibitems() via temporary file + append",
+      "format": "CSV appended to existing file (preserves header)"
+    },
+    "sample_entry": {
+      "raw_text": "Arras, John D. (2007). The Way We Reason Now: Reflective Equilibrium in Bioethics. In: The Oxford Handbook of Bioethics. Ed. by Bonnie Steinbock. Oxford University Press, pp. 46-71. doi: 10.1093/oxfordhb/9780199562411.003.0003.",
+      "type": "incollection",
+      "title": "The Way We Reason Now: Reflective Equilibrium in Bioethics",
+      "year": 2007,
+      "authors": [{"given": "John D", "family": "Arras"}],
+      "start_page": "46",
+      "end_page": "71",
+      "doi": "10.1093/oxfordhb/9780199562411.003.0003"
+    },
+    "data_quality": {
+      "completeness": "Good for structured bibliographies",
+      "accuracy": "Depends on PDF text extraction quality and OCR",
+      "common_fields": ["type", "title", "authors", "year", "journal", "pages", "doi", "publisher"],
+      "cleaning_applied": [
+        "Curly quote removal",
+        "Line-break hyphen fixing",
+        "OCR artifact correction",
+        "DOI punctuation cleanup"
+      ],
+      "challenges": "Varies by citation style, PDF quality, and bibliography formatting"
+    },
+    "script_location": "philoch_bib_enhancer/adapters/raw_text/extractors/parse_pdf_bibliography.py",
+    "helper_script": "philoch_bib_enhancer/adapters/raw_text/extractors/extract_pdf_text.py (for initial text extraction)",
+    "usage": "python parse_pdf_bibliography.py",
+    "example_files": [
+      "data/biblio/biblio-training/new-ones-for-Claude/freivogel.pdf (37 references extracted)"
+    ]
   }
 }
