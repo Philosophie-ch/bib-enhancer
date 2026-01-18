@@ -8,6 +8,7 @@ but doesn't know about concrete implementations (no I/O details, no CSV format, 
 Concrete implementations are injected from the outside via function parameters.
 """
 
+import os
 from typing import Callable, Generator, Tuple, Iterable, Literal
 from pydantic import BaseModel
 from aletk.ResultMonad import main_try_except_wrapper
@@ -153,8 +154,6 @@ def main(main_in: JournalScraperMainIN) -> None:
         lgr.info("Bibkey matching completed.")
 
     # Step 3: Write results (delegated to injected function)
-    import os
-
     output_filename = f"{journal_scraper_in.issn}_articles.csv"
     output_path = os.path.join(main_in.output_dir, output_filename)
     lgr.info(f"Writing articles to {output_path}...")
