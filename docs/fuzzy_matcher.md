@@ -10,13 +10,6 @@
   --output data/test-2/dialectica-merged.csv \
   --top-n 5
 
-# Force Python scorer (skip Rust)
-.venv/bin/python -m philoch_bib_enhancer.cli.fuzzy_matcher_cli \
-  --input data/input.csv \
-  --bibliography data/biblio/biblio-v10-table.ods \
-  --output data/output.csv \
-  --force-python
-
 # Show help
 .venv/bin/python -m philoch_bib_enhancer.cli.fuzzy_matcher_cli --help
 ```
