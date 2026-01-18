@@ -5,6 +5,7 @@ This CLI dispatches to different adapter implementations based on the
 --gateway parameter (or SCRAPE_JOURNAL_DEFAULT_GATEWAY environment variable).
 """
 
+import importlib
 import os
 import sys
 import argparse
@@ -59,8 +60,6 @@ def dispatch_to_gateway(gateway_name: str, args: list[str]) -> None:
     lgr.info(f"Dispatching to gateway: {gateway_name} ({module_path})")
 
     # Dynamically import the gateway module
-    import importlib
-
     module = importlib.import_module(module_path)
 
     # Call the cli() function from the gateway module

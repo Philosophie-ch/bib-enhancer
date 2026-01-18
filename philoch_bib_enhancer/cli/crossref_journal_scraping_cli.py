@@ -28,6 +28,7 @@ from philoch_bib_enhancer.ports.journal_scraping import (
     main,
     JournalScraperMainIN,
     JournalScraperIN,
+    JournalScraperBibkeyMatchingTabular,
     TBibkeyMatcher,
 )
 
@@ -241,8 +242,6 @@ def cli() -> None:
     args = parse_args()
 
     # === VALIDATE INPUT (Pydantic at boundary) ===
-    from philoch_bib_enhancer.ports.journal_scraping import JournalScraperBibkeyMatchingTabular
-
     issn = args.issn
     year_range = (args.start_year, args.end_year)
 
