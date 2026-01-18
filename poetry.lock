@@ -1973,13 +1973,18 @@ ptyprocess = ">=0.5"
 
 [[package]]
 name = "philoch-bib-sdk"
-version = "0.2.0"
+version = "0.3.9"
 description = "Standard development kit for the Philosophie Bibliography project"
 optional = false
 python-versions = ">=3.13"
 groups = ["main"]
 files = [
-    {file = "philoch_bib_sdk-0.2.0-cp313-cp313-manylinux_2_34_x86_64.whl", hash = "sha256:5e8a62ed3960668217158e7a6304941c507b42cd3144c3d92363c093071bbba3"},
+    {file = "philoch_bib_sdk-0.3.9-cp313-cp313-macosx_10_12_x86_64.whl", hash = "sha256:64974dba5c9d68f869c269a0d9c17c019f58c2fe001527fb2585ffbed910a326"},
+    {file = "philoch_bib_sdk-0.3.9-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:70dc1693da1e6a5b9691696c3160ee203ff14be68e519a32a19aee33222843f2"},
+    {file = "philoch_bib_sdk-0.3.9-cp313-cp313-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:8c48bb60886f9cfa57a5faa6bab2a249ff0353a29cc71a3cb83c7cf7a0abe11c"},
+    {file = "philoch_bib_sdk-0.3.9-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:d9083f68ab86baf9c28dd0732298ede25a7a966b87c5bee83b721984d228a0ae"},
+    {file = "philoch_bib_sdk-0.3.9-cp313-cp313-win_amd64.whl", hash = "sha256:a8d2a48e73166c229fdc9f1c5aef142e73f6809f1bb5760445e9d88d54eda461"},
+    {file = "philoch_bib_sdk-0.3.9.tar.gz", hash = "sha256:4a83109b7d15489cfbf1916e20b5988d4e700a1b4bb44132240af3c4c60be772"},
 ]
 
 [[package]]
@@ -3442,4 +3447,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.13"
-content-hash = "0b56c5811730303ca1bde28381984318413cda48d0dbfc2e8a6a85f9b3db204f"
+content-hash = "8284b7faf75b8e5990225b6948fd34b7b43990f5bbdd5cc7be11fba531842b78"
