@@ -4,11 +4,14 @@ Extract detailed bibliographic records from UNIFR Philosophy pages using structu
 This version uses JSON-LD and Dublin Core meta tags for accurate extraction.
 """
 
-from bs4 import BeautifulSoup, Tag
-import re
-import requests
-import time
 import json
+import os
+import re
+import time
+
+import requests
+from bs4 import BeautifulSoup, Tag
+
 from philoch_bib_enhancer.adapters.raw_text.raw_text_models import (
     RawTextBibitem,
     RawTextAuthor,
@@ -263,8 +266,6 @@ print(f"{'='*80}")
 
 if bibitems:
     # Save to output
-    import os
-
     os.makedirs("./data/test-2", exist_ok=True)
     output_path = "./data/test-2/folia_unifr_references.csv"
 
