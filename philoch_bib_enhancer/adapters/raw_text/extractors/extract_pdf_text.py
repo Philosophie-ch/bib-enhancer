@@ -42,7 +42,7 @@ def extract_text_from_pdf(pdf_path: str) -> str:
         return text
     elif PDF_LIBRARY == "pypdf2":
         with open(pdf_path, 'rb') as file:
-            reader = PyPDF2.PdfReader(file)  # type: ignore
+            reader = PyPDF2.PdfReader(file)
             text = ""
             for page in reader.pages:
                 text += page.extract_text()
