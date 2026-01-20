@@ -20,7 +20,7 @@ from philoch_bib_sdk.adapters.io.csv import load_staged_csv_allow_empty_bibkeys
 from philoch_bib_sdk.adapters.io.ods import load_bibliography_ods, load_staged_ods
 from philoch_bib_sdk.logic.functions.fuzzy_matcher import (
     build_index_cached,
-    stage_bibitems_batch,
+    stage_bibitems_streaming,
     _RUST_SCORER_AVAILABLE,
 )
 from philoch_bib_sdk.logic.models import BibItem, BibStringAttr
@@ -216,71 +216,44 @@ def load_bibliography_as_dict(file_path: Path) -> dict[str, BibItem]:
     return result.out
 
 
-def write_merged_csv(
-    input_rows: list[dict[str, str]],
-    staged: tuple[BibItemStaged, ...],
-    bibliography_dict: dict[str, BibItem],
-    output_path: Path,
+def build_output_row(
+    input_row: dict[str, str],
+    staged_item: BibItemStaged,
+    plaintext_citations: dict[str, str],
     top_n: int,
-) -> None:
-    """Write merged CSV with bibliography columns + match columns."""
-    if not input_rows:
-        lgr.warning("No input rows to write")
-        return
+) -> dict[str, str]:
+    """Build a single output row from input row and staged match result."""
+    output_row: dict[str, str] = {}
 
-    # Build match columns
+    # Start with bibliography columns from input (fill missing with empty)
+    for col in BIBLIOGRAPHY_COLUMNS:
+        output_row[col] = input_row.get(col, "")
+
+    # Add match columns
+    for j, match in enumerate(staged_item.top_matches[:top_n], start=1):
+        output_row[f"match_{j}_bibkey"] = match.bibkey
+        output_row[f"match_{j}_score"] = str(round(match.total_score, 2))
+        output_row[f"match_{j}_full_entry"] = plaintext_citations.get(match.bibkey, "")
+
+    # Fill remaining match slots with empty
+    for j in range(len(staged_item.top_matches) + 1, top_n + 1):
+        output_row[f"match_{j}_bibkey"] = ""
+        output_row[f"match_{j}_score"] = ""
+        output_row[f"match_{j}_full_entry"] = ""
+
+    output_row["candidates_searched"] = str(staged_item.search_metadata.get("candidates_searched", 0))
+    output_row["search_time_ms"] = str(round(staged_item.search_metadata.get("search_time_ms", 0), 1))
+
+    return output_row
+
+
+def get_output_columns(top_n: int) -> list[str]:
+    """Get the full list of output columns including match columns."""
     match_columns: list[str] = []
     for i in range(1, top_n + 1):
         match_columns.extend([f"match_{i}_bibkey", f"match_{i}_score", f"match_{i}_full_entry"])
     match_columns.extend(["candidates_searched", "search_time_ms"])
-
-    # Full column list
-    all_columns = BIBLIOGRAPHY_COLUMNS + match_columns
-
-    # Build plaintext citation lookup
-    plaintext_citations: dict[str, str] = {}
-    for bibkey, bibitem in bibliography_dict.items():
-        plaintext_citations[bibkey] = build_plaintext_citation(bibitem)
-
-    # Write output
-    with open(output_path, "w", encoding="utf-8", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=all_columns)
-        writer.writeheader()
-
-        for i, input_row in enumerate(input_rows):
-            # Start with bibliography columns from input (fill missing with empty)
-            output_row: dict[str, str] = {}
-            for col in BIBLIOGRAPHY_COLUMNS:
-                output_row[col] = input_row.get(col, "")
-
-            # Add match data from staged results
-            if i < len(staged):
-                staged_item = staged[i]
-
-                # Add match columns
-                for j, match in enumerate(staged_item.top_matches[:top_n], start=1):
-                    output_row[f"match_{j}_bibkey"] = match.bibkey
-                    output_row[f"match_{j}_score"] = str(round(match.total_score, 2))
-                    output_row[f"match_{j}_full_entry"] = plaintext_citations.get(match.bibkey, "")
-
-                # Fill remaining match slots with empty
-                for j in range(len(staged_item.top_matches) + 1, top_n + 1):
-                    output_row[f"match_{j}_bibkey"] = ""
-                    output_row[f"match_{j}_score"] = ""
-                    output_row[f"match_{j}_full_entry"] = ""
-
-                output_row["candidates_searched"] = str(staged_item.search_metadata.get("candidates_searched", 0))
-                output_row["search_time_ms"] = str(round(staged_item.search_metadata.get("search_time_ms", 0), 1))
-            else:
-                # No staged result for this row
-                for j in range(1, top_n + 1):
-                    output_row[f"match_{j}_bibkey"] = ""
-                    output_row[f"match_{j}_score"] = ""
-                    output_row[f"match_{j}_full_entry"] = ""
-                output_row["candidates_searched"] = ""
-                output_row["search_time_ms"] = ""
-
-            writer.writerow(output_row)
+    return BIBLIOGRAPHY_COLUMNS + match_columns
 
 
 # ============================================================================
@@ -417,23 +390,44 @@ def cli() -> None:
     index = build_index_cached(bibliography, cache_path=cache_path, force_rebuild=args.force_rebuild)
     lginf(frame, f"Index ready in {time.perf_counter() - start:.1f}s", lgr)
 
-    # === RUN FUZZY MATCHING ===
-    lginf(frame, f"Running fuzzy matching ({len(subjects)} subjects vs {len(index.all_items)} candidates)...", lgr)
-    start = time.perf_counter()
-    staged = stage_bibitems_batch(
-        subjects,
-        index,
-        top_n=args.top_n,
-        min_score=args.min_score,
-        use_rust=use_rust,
-    )
-    elapsed = time.perf_counter() - start
-    lginf(frame, f"Matching completed in {elapsed:.1f}s ({elapsed/len(subjects):.2f}s per item)", lgr)
+    # === BUILD PLAINTEXT CITATION LOOKUP ===
+    plaintext_citations: dict[str, str] = {}
+    for bibkey, bibitem in bibliography_dict.items():
+        plaintext_citations[bibkey] = build_plaintext_citation(bibitem)
 
-    # === WRITE MERGED OUTPUT ===
-    lginf(frame, f"Writing merged results to {output_path}...", lgr)
-    write_merged_csv(input_rows, staged, bibliography_dict, output_path, args.top_n)
-    lginf(frame, f"Done. Wrote {len(input_rows)} rows to {output_path}", lgr)
+    # === RUN FUZZY MATCHING (STREAMING) ===
+    total = len(subjects)
+    lginf(frame, f"Running fuzzy matching ({total} subjects vs {len(index.all_items)} candidates)...", lgr)
+    lginf(frame, f"Streaming results to {output_path} (use 'tail -f {output_path}' to monitor)", lgr)
+
+    all_columns = get_output_columns(args.top_n)
+    start = time.perf_counter()
+
+    with open(output_path, "w", encoding="utf-8", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=all_columns)
+        writer.writeheader()
+        f.flush()
+
+        for i, staged_item in enumerate(
+            stage_bibitems_streaming(
+                subjects,
+                index,
+                top_n=args.top_n,
+                min_score=args.min_score,
+            )
+        ):
+            output_row = build_output_row(input_rows[i], staged_item, plaintext_citations, args.top_n)
+            writer.writerow(output_row)
+            f.flush()  # Ensure immediate write to disk for tail -f
+
+            # Progress logging every 10 items
+            if (i + 1) % 10 == 0 or (i + 1) == total:
+                elapsed = time.perf_counter() - start
+                rate = (i + 1) / elapsed if elapsed > 0 else 0
+                lginf(frame, f"Processed {i + 1}/{total} items ({rate:.1f} items/s)", lgr)
+
+    elapsed = time.perf_counter() - start
+    lginf(frame, f"Done. Wrote {total} rows to {output_path} in {elapsed:.1f}s", lgr)
 
 
 if __name__ == "__main__":
