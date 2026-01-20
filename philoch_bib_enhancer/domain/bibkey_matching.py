@@ -57,8 +57,8 @@ def match_bibkey_to_article(
             "out": updated,
         }
 
-    except KeyError:
-        # Index lookup failed - return article unchanged
+    except (KeyError, ValueError):
+        # Index lookup failed or article missing volume/number - return article unchanged
         return {
             "parsing_status": "success",
             "out": bibitem,

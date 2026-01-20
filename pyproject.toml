@@ -89,3 +89,4 @@ extend-exclude = '''
 [tool.poetry.scripts]
 format = "scripts.format:main"
 scrape-journal = "philoch_bib_enhancer.cli.scrape_journal_cli:cli"
+fuzzy-matcher = "philoch_bib_enhancer.cli.fuzzy_matcher_cli:cli"
