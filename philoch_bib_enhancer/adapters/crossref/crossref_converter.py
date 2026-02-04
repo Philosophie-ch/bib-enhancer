@@ -1,4 +1,4 @@
-from typing import Any, Dict, Literal, Tuple
+from typing import Literal, Tuple
 from philoch_bib_sdk.logic.models import (
     BibItem,
 )
@@ -13,17 +13,17 @@ from philoch_bib_enhancer.domain.parsing_result import ParsedResult
 from philoch_bib_sdk.logic.default_models import BibItemArgs, BibItemDateArgs, PageArgs, default_bib_item
 
 
-def _convert_raw_crossref_response_to_crossref_article(raw_object: Dict[Any, Any]) -> CrossrefArticle:
+def _convert_raw_crossref_response_to_crossref_article(raw_object: dict[str, object]) -> CrossrefArticle:
     """
     Convert a raw Crossref response object to a CrossrefArticle model.
 
     :param raw_object: The raw response object from Crossref.
     :return: An instance of CrossrefArticle.
     """
-    return CrossrefArticle(**raw_object)
+    return CrossrefArticle.model_validate(raw_object)
 
 
-def convert_raw_crossref_response_to_crossref_article(raw_object: Dict[Any, Any]) -> ParsedResult[CrossrefArticle]:
+def convert_raw_crossref_response_to_crossref_article(raw_object: dict[str, object]) -> ParsedResult[CrossrefArticle]:
     """
     Convert a raw Crossref response object to a ParsedCrossrefArticle model.
 
@@ -132,7 +132,7 @@ def _convert_crossref_article_to_bibitem(crossref_article: CrossrefArticle) -> B
     return result
 
 
-def convert_crossref_response_to_bibitem(raw_object: Dict[Any, Any]) -> ParsedResult[BibItem]:
+def convert_crossref_response_to_bibitem(raw_object: dict[str, object]) -> ParsedResult[BibItem]:
     """
     Convert a raw Crossref response object to a BibItem instance.
 

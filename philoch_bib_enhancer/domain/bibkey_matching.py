@@ -40,12 +40,6 @@ def match_bibkey_to_article(
 
     try:
         bibkey = get_bibkey_by_journal_volume_number(index, bibitem)
-        if bibkey is None:
-            # No match found - return article unchanged
-            return {
-                "parsing_status": "success",
-                "out": bibitem,
-            }
 
         # Match found - return new article with bibkey
         updated = attrs.evolve(

@@ -6,9 +6,25 @@ Uses POST requests with form parameters to get pre-filtered results.
 import requests
 import re
 import time
-from typing import Any, Optional
+from typing import Optional, TypedDict
 from bs4 import BeautifulSoup, Tag
 from philoch_bib_enhancer.adapters.raw_text.raw_text_models import RawTextBibitem, RawTextAuthor
+
+
+class FilteredPageResponse(TypedDict):
+    html: str
+
+
+class ParsedPageItem(TypedDict):
+    id: str | list[str] | None
+    title: str | None
+    year: int | None
+    authors: list[RawTextAuthor]
+    raw_text: str
+    classification: str | None
+    publisher: str | None
+
+
 from philoch_bib_enhancer.cli.manual_raw_text_to_csv import process_raw_bibitems
 
 
@@ -28,7 +44,7 @@ def parse_author_string(author_str: Optional[str]) -> list[RawTextAuthor]:
             return [RawTextAuthor(family=author_str)]
 
 
-def fetch_filtered_page(page_num: int) -> dict[str, Any]:
+def fetch_filtered_page(page_num: int) -> FilteredPageResponse:
     """Fetch a page using POST with form parameters (as browser does)."""
     url = 'https://www.fr.ch/app/master_cat/get_results'
 
@@ -41,7 +57,7 @@ def fetch_filtered_page(page_num: int) -> dict[str, Any]:
     }
 
     response = requests.post(url, data=data, timeout=15)
-    result: dict[str, Any] = response.json()
+    result: FilteredPageResponse = response.json()
     return result
 
 
@@ -57,10 +73,10 @@ def extract_total_count(html: str) -> Optional[int]:
     return None
 
 
-def parse_page_items(html: str) -> list[dict[str, Any]]:
+def parse_page_items(html: str) -> list[ParsedPageItem]:
     """Parse items from HTML response."""
     soup = BeautifulSoup(html, 'html.parser')
-    items: list[dict[str, Any]] = []
+    items: list[ParsedPageItem] = []
 
     list_items = soup.find_all('li', class_='element-list')
 
@@ -197,7 +213,7 @@ print(f"{'=' * 80}\n")
 print("Sample entries with years extracted:")
 for i, item in enumerate(all_items[:5]):
     print(
-        f"  {i+1}. {item.get('title', 'N/A')[:60]}... -> Year: {item.get('year', 'N/A')} (from: {item.get('classification', 'N/A')})"
+        f"  {i+1}. {(item['title'] or 'N/A')[:60]}... -> Year: {item['year'] or 'N/A'} (from: {item['classification'] or 'N/A'})"
     )
 print()
 

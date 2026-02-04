@@ -36,7 +36,7 @@ def sample_bibliography() -> Tuple[BibItem, ...]:
             author=({"given_name": {"latex": "John"}, "family_name": {"latex": "Smith"}},),
             date={"year": 2024},
             entry_type="article",
-            journal={"name": {"latex": "Philosophy Today"}},
+            journal={"name": {"latex": "Philosophy Today", "simplified": "philosophy today"}},
             volume="10",
             number="2",
         ),
@@ -46,6 +46,7 @@ def sample_bibliography() -> Tuple[BibItem, ...]:
             author=({"given_name": {"latex": "Jane"}, "family_name": {"latex": "Doe"}},),
             date={"year": 2023},
             entry_type="article",
+            journal={"name": {"latex": "Ethics Quarterly", "simplified": "ethics quarterly"}},
         ),
         default_bib_item(
             bibkey={"first_author": "Johnson", "date": 2022},
@@ -57,6 +58,7 @@ def sample_bibliography() -> Tuple[BibItem, ...]:
             date={"year": 2022},
             entry_type="book",
             publisher={"latex": "Academic Press"},
+            journal={"name": {"latex": "Metaphysics Press", "simplified": "metaphysics press"}},
         ),
     )
 
