@@ -1,7 +1,24 @@
 import logging
 from time import sleep
-from typing import Any
+from typing import TypedDict
+
 from habanero import Crossref
+
+
+class CrossrefJournalMessage(TypedDict):
+    title: str
+
+
+class CrossrefJournalResponse(TypedDict):
+    message: CrossrefJournalMessage
+
+
+class CrossrefArticlesMessage(TypedDict):
+    items: list[dict[str, object]]
+
+
+class CrossrefArticlesResponse(TypedDict):
+    message: CrossrefArticlesMessage
 
 
 class CrossrefClient:
@@ -24,10 +41,10 @@ class CrossrefClient:
         return self._email
 
     @property
-    def raw_client(self) -> Crossref:
+    def raw_client(self) -> Crossref:  # type: ignore[no-any-unimported]  # habanero is untyped
         return self._client
 
-    def _get_client(self) -> Crossref:
+    def _get_client(self) -> Crossref:  # type: ignore[no-any-unimported]  # habanero is untyped
         client = Crossref(
             mailto=self.email,
         )
@@ -51,7 +68,7 @@ class CrossrefClient:
         """
         Get the name of a journal by its ISSN.
         """
-        response: dict[Any, Any] = self.raw_client.journals(ids=issn)
+        response: CrossrefJournalResponse = self.raw_client.journals(ids=issn)
         journal_name = response["message"]["title"]
 
         if not isinstance(journal_name, str):
@@ -59,11 +76,11 @@ class CrossrefClient:
 
         return journal_name
 
-    def journal_articles_by_issn_year(self, issn: str, year: int) -> dict[Any, Any]:
+    def journal_articles_by_issn_year(self, issn: str, year: int) -> CrossrefArticlesResponse:
         """
         Get the articles of a journal by its ISSN and a year.
         """
-        response: dict[Any, Any] = self.raw_client.journals(
+        response: CrossrefArticlesResponse = self.raw_client.journals(
             ids=issn,
             works=True,
             filter={

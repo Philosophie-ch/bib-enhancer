@@ -2,14 +2,14 @@
 
 [[package]]
 name = "aletk"
-version = "0.1.6"
+version = "0.1.8"
 description = "Collection of general purpose tools to work with Python"
 optional = false
 python-versions = ">=3.13"
 groups = ["main"]
 files = [
-    {file = "aletk-0.1.6-py3-none-any.whl", hash = "sha256:475eb72fcc2566b7d4b55043966b55957626bfc58d250e42859a7f7134a4c673"},
-    {file = "aletk-0.1.6.tar.gz", hash = "sha256:f6cb943c428cac3805e598a80a6d1227703b3bb54c8a55906974707f19b6d8ba"},
+    {file = "aletk-0.1.8-py3-none-any.whl", hash = "sha256:ffb4791d2fb174392e1171fc1b58c19c9e88a66e9cdb1dcde96fa9aa5c45abae"},
+    {file = "aletk-0.1.8.tar.gz", hash = "sha256:c8fa1c31aed35e2f1fe032995f3d44935cc0e0bddfcacf98f6a2fcf80809a9d8"},
 ]
 
 [package.dependencies]
@@ -17,7 +17,7 @@ fuzzywuzzy = "*"
 python-Levenshtein = "*"
 
 [package.extras]
-dev = ["black", "jupyter", "mypy", "pytest"]
+dev = ["autoflake", "black", "jupyter", "mypy", "pytest"]
 
 [[package]]
 name = "annotated-types"
@@ -2163,24 +2163,25 @@ ptyprocess = ">=0.5"
 
 [[package]]
 name = "philoch-bib-sdk"
-version = "0.4.2"
+version = "0.5.0"
 description = "Standard development kit for the Philosophie Bibliography project"
 optional = false
 python-versions = ">=3.13"
 groups = ["main"]
 files = [
-    {file = "philoch_bib_sdk-0.4.2-cp313-cp313-macosx_10_12_x86_64.whl", hash = "sha256:ea14d1202a8f160876c8ead6cb0170312ab35cc88f96d5a1f5967654643e849a"},
-    {file = "philoch_bib_sdk-0.4.2-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:d138e575fddb91c94cf87e2359391c9ae24cc33efae2c399d5b47feb05310123"},
-    {file = "philoch_bib_sdk-0.4.2-cp313-cp313-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:0a0743f37296e8b70d65d8e66217b8b647bb5b448ac266732bd78320b98de9fd"},
-    {file = "philoch_bib_sdk-0.4.2-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:1078496d8720f83feabc63ffd8ff1d7e999af0391e2c2bae79402590fb4bddca"},
-    {file = "philoch_bib_sdk-0.4.2-cp313-cp313-win_amd64.whl", hash = "sha256:4f9737729384bd074d552be42575cc08c560b00c9b169a3201313d168f86ebf0"},
-    {file = "philoch_bib_sdk-0.4.2.tar.gz", hash = "sha256:8c74c6050a9f7ebf82fc44da3e02efeec83d9fcc828600f06e51bfaaac63acfa"},
+    {file = "philoch_bib_sdk-0.5.0-cp313-cp313-macosx_10_12_x86_64.whl", hash = "sha256:f85ebefdc14f476d6fdc7499d24801ecca4740bfeb4784d9775d06f293a5b7b5"},
+    {file = "philoch_bib_sdk-0.5.0-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:63b65e641fbc2cd22629740b0f7e10be795a48be03260a7b8bc2e8450fa7df0a"},
+    {file = "philoch_bib_sdk-0.5.0-cp313-cp313-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:eb475a7f18ba36fa046e258d68caa085c03662ae9fe36d2d9ba3c7ca58233941"},
+    {file = "philoch_bib_sdk-0.5.0-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:4d28c9ea919257abd4b916afee8415dcb7b52268560f9bb7735b39e33f67c2ae"},
+    {file = "philoch_bib_sdk-0.5.0-cp313-cp313-win_amd64.whl", hash = "sha256:8abdb4b2762b0ddbf443e61e11825138c9e8890b9d58f6a1d68b2aa3b8cf0d7e"},
+    {file = "philoch_bib_sdk-0.5.0.tar.gz", hash = "sha256:ac1fe5edfd322b79c3eb552e08ab291c17386d20a64c45fe15f2ba6b65172dc8"},
 ]
 
 [package.dependencies]
-aletk = ">=0.1.6"
+aletk = ">=0.1.8"
 attrs = ">=25.3.0"
 cytoolz = ">=1.0.1"
+httpx = ">=0.28.0"
 polars = ">=1.32.3"
 pydantic = ">=2.11.9"
 
@@ -3678,4 +3679,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.13"
-content-hash = "89045abd8760cd652cf489262517b1e45a5d00ff14d2b5c98f5c59ef59118937"
+content-hash = "9e629a89d5e3380019a5e6d3580cf45bc74f2501127dfd55941c2e1d574b67f0"

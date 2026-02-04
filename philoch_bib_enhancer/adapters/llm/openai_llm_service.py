@@ -8,7 +8,7 @@ Environment variables:
     OPENAI_API_KEY: Your OpenAI API key
 """
 
-from typing import TypeVar, Any
+from typing import TypeVar
 from pydantic import BaseModel
 
 try:
@@ -31,7 +31,7 @@ class OpenAIMessage(BaseModel):
 
     role: str
     content: str | None = None
-    parsed: Any | None = None  # The structured output (untyped by OpenAI)
+    parsed: object | None = None  # The structured output (untyped by OpenAI)
 
 
 class OpenAIChoice(BaseModel):
@@ -105,17 +105,8 @@ class OpenAILLMService:
             if parsed_any is None:
                 raise LLMServiceError("OpenAI returned no parsed output")
 
-            # Don't trust OpenAI's untyped parsed field - re-validate with our model
-            # Convert to dict if it has dict-like attributes, otherwise treat as dict
-            if hasattr(parsed_any, 'model_dump'):
-                parsed_dict = parsed_any.model_dump()
-            elif hasattr(parsed_any, '__dict__'):
-                parsed_dict = vars(parsed_any)
-            else:
-                parsed_dict = dict(parsed_any)
-
-            # Parse and validate with our Pydantic model
-            return model_class.model_validate(parsed_dict)
+            # Re-validate with our Pydantic model (handles dicts, BaseModel instances, etc.)
+            return model_class.model_validate(parsed_any)
 
         except openai.APIError as e:
             raise LLMServiceError(f"OpenAI API error: {e}") from e

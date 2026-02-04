@@ -1,6 +1,5 @@
 import ast
 import os
-from typing import Any, List, Tuple
 
 import pytest
 
@@ -39,12 +38,12 @@ def crossref_client() -> CrossrefClient:
 
 
 @pytest.fixture
-def raw_crossref_articles() -> List[dict[Any, Any]]:
+def raw_crossref_articles() -> list[dict[str, object]]:
     return EXAMPLE_JOURNALS_RESPONSE['message']['items']  # type: ignore
 
 
 @pytest.fixture
-def raw_crossref_article() -> Tuple[List[str], Any]:
+def raw_crossref_article() -> tuple[list[str], dict[str, object]]:
     correct_title = ['ÊTRE ET PENSÉE']
     raw = ast.literal_eval(EXAMPLE_ARTICLE_RESPONSE)
     return correct_title, raw
