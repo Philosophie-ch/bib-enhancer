@@ -23,6 +23,9 @@ jobs:
       with:
         python-version: '3.13'
 
+    - name: Install Rust
+      uses: dtolnay/rust-toolchain@stable
+
     - name: Install poetry
       run: |
         sudo apt-get update
@@ -35,6 +38,12 @@ jobs:
         poetry env use 3.13
         poetry install --no-root
 
+    - name: Build Rust extension
+      run: poetry run maturin develop
+
+    - name: Run clippy
+      run: cargo clippy -- -D warnings
+
     - name: Run black
       run: poetry run black --check .
 
@@ -45,6 +54,6 @@ jobs:
       env:
         CROSSREF_EMAIL: ci-dummy@example.com
       run: poetry run pytest
-      
-    - name: Run build
-      run: poetry build
+
+    - name: Build wheel with maturin
+      run: poetry run maturin build --release

@@ -8,7 +8,7 @@ from typing import Tuple
 import pytest
 
 from philoch_bib_sdk.logic.default_models import default_bib_item
-from philoch_bib_sdk.logic.functions.fuzzy_matcher import (
+from philoch_bib_enhancer.fuzzy_matching.matcher import (
     build_index,
     build_index_cached,
     stage_bibitems_batch,

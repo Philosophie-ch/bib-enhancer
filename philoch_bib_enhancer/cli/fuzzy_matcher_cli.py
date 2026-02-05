@@ -18,13 +18,13 @@ from aletk.utils import get_logger, lginf
 
 from philoch_bib_sdk.adapters.io.csv import load_staged_csv_allow_empty_bibkeys
 from philoch_bib_sdk.adapters.io.ods import load_bibliography_ods, load_staged_ods
-from philoch_bib_sdk.logic.functions.fuzzy_matcher import (
+from philoch_bib_enhancer.fuzzy_matching.matcher import (
     build_index_cached,
     stage_bibitems_streaming,
     _RUST_SCORER_AVAILABLE,
 )
 from philoch_bib_sdk.logic.models import BibItem, BibStringAttr
-from philoch_bib_sdk.logic.models_staging import BibItemStaged
+from philoch_bib_enhancer.fuzzy_matching.models import BibItemStaged, FuzzyMatchWeights, weights_to_tuple
 
 lgr = get_logger(__file__)
 
@@ -327,6 +327,11 @@ def parse_args() -> argparse.Namespace:
         help="Force Python scorer (skip Rust even if available).",
     )
 
+    parser.add_argument("--weight-title", type=float, default=None, help="Weight for title scoring (default: 0.5)")
+    parser.add_argument("--weight-author", type=float, default=None, help="Weight for author scoring (default: 0.3)")
+    parser.add_argument("--weight-date", type=float, default=None, help="Weight for date scoring (default: 0.1)")
+    parser.add_argument("--weight-bonus", type=float, default=None, help="Weight for bonus field scoring (default: 0.1)")
+
     return parser.parse_args()
 
 
@@ -364,6 +369,19 @@ def cli() -> None:
     # Create cache directory if needed
     cache_dir.mkdir(parents=True, exist_ok=True)
     cache_path = cache_dir / f"{bib_path.stem}-index.pkl"
+
+    # === BUILD WEIGHTS ===
+    weights: FuzzyMatchWeights | None = None
+    if any(w is not None for w in [args.weight_title, args.weight_author, args.weight_date, args.weight_bonus]):
+        weights = {
+            "title": args.weight_title if args.weight_title is not None else 0.5,
+            "author": args.weight_author if args.weight_author is not None else 0.3,
+            "date": args.weight_date if args.weight_date is not None else 0.1,
+            "bonus": args.weight_bonus if args.weight_bonus is not None else 0.1,
+        }
+        weight_sum = sum(weights_to_tuple(weights))
+        if abs(weight_sum - 1.0) > 0.01:
+            lgr.warning(f"Weights sum to {weight_sum:.3f}, not 1.0. Results may not be normalized.")
 
     # === REPORT CONFIGURATION ===
     use_rust = _RUST_SCORER_AVAILABLE and not args.force_python
@@ -414,6 +432,7 @@ def cli() -> None:
                 index,
                 top_n=args.top_n,
                 min_score=args.min_score,
+                weights=weights,
             )
         ):
             output_row = build_output_row(input_rows[i], staged_item, plaintext_citations, args.top_n)

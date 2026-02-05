@@ -13,8 +13,12 @@ readme = "README.md"
 requires-python = ">=3.13"
 
 [build-system]
-requires = ["poetry-core>=2.0.0,<3.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["maturin>=1.0,<2.0"]
+build-backend = "maturin"
+
+[tool.maturin]
+features = ["pyo3/extension-module"]
+module-name = "philoch_bib_enhancer._rust"
 
 [tool.poetry.dependencies]
 aletk = "^0.1.8"
@@ -29,6 +33,7 @@ requests = "^2.32.3"
 fastexcel = "^0.14.0"
 pymupdf = "^1.26.7"
 pypdf2 = "^3.0.1"
+cytoolz = "^1.0.1"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.5"
@@ -38,6 +43,7 @@ jupyter = "^1.1.1"
 pytest-env = "^1.1.5"
 autoflake = "^2.3.1"
 python-dotenv = "^1.1.1"
+maturin = "^1.8.0"
 
 [tool.mypy]
 python_version = "3.13"
@@ -86,6 +92,7 @@ module = [
     "pypdf",
     "docx",
     "bs4",
+    "cytoolz",
 ]
 ignore_missing_imports = true
 
