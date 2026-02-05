@@ -339,3 +339,70 @@ class TestStageBibitemsBatch:
         weights: FuzzyMatchWeights = {"title": 0.7, "author": 0.1, "date": 0.1, "bonus": 0.1}
         staged = stage_bibitems_batch((subject_close_match,), index, top_n=2, use_rust=False, weights=weights)
         assert len(staged) == 1
+
+
+# ============================================================================
+# Weight behavior tests (verify weights actually change rankings)
+# ============================================================================
+
+
+class TestWeightsBehavior:
+    """Tests that different weight configurations produce different ranking outcomes."""
+
+    def test_title_heavy_weights_rank_title_match_first(
+        self,
+        weight_test_bibliography: Tuple[BibItem, ...],
+        bib_title_strong: BibItem,
+        subject_close_match: BibItem,
+    ) -> None:
+        """With title-heavy weights, the title-matching item should be rank 1."""
+        title_heavy: FuzzyMatchWeights = {"title": 0.9, "author": 0.05, "date": 0.025, "bonus": 0.025}
+        index = build_index(weight_test_bibliography)
+        matches = find_similar_bibitems(subject_close_match, index, top_n=2, weights=title_heavy)
+        assert len(matches) >= 1
+        assert matches[0].matched_bibitem is bib_title_strong
+
+    def test_author_heavy_weights_rank_author_match_first(
+        self,
+        weight_test_bibliography: Tuple[BibItem, ...],
+        bib_author_strong: BibItem,
+        subject_close_match: BibItem,
+    ) -> None:
+        """With author-heavy weights, the author-matching item should be rank 1."""
+        author_heavy: FuzzyMatchWeights = {"title": 0.05, "author": 0.9, "date": 0.025, "bonus": 0.025}
+        index = build_index(weight_test_bibliography)
+        matches = find_similar_bibitems(subject_close_match, index, top_n=2, weights=author_heavy)
+        assert len(matches) >= 1
+        assert matches[0].matched_bibitem is bib_author_strong
+
+    def test_weights_flip_ranking(
+        self,
+        weight_test_bibliography: Tuple[BibItem, ...],
+        subject_close_match: BibItem,
+    ) -> None:
+        """Switching from title-heavy to author-heavy weights must flip rank 1."""
+        title_heavy: FuzzyMatchWeights = {"title": 0.9, "author": 0.05, "date": 0.025, "bonus": 0.025}
+        author_heavy: FuzzyMatchWeights = {"title": 0.05, "author": 0.9, "date": 0.025, "bonus": 0.025}
+        index = build_index(weight_test_bibliography)
+
+        matches_title = find_similar_bibitems(subject_close_match, index, top_n=2, weights=title_heavy)
+        matches_author = find_similar_bibitems(subject_close_match, index, top_n=2, weights=author_heavy)
+
+        assert matches_title[0].matched_bibitem is not matches_author[0].matched_bibitem
+
+    def test_batch_weights_flip_ranking(
+        self,
+        weight_test_bibliography: Tuple[BibItem, ...],
+        subject_close_match: BibItem,
+    ) -> None:
+        """Same ranking flip should work through the batch API (Python path)."""
+        title_heavy: FuzzyMatchWeights = {"title": 0.9, "author": 0.05, "date": 0.025, "bonus": 0.025}
+        author_heavy: FuzzyMatchWeights = {"title": 0.05, "author": 0.9, "date": 0.025, "bonus": 0.025}
+        index = build_index(weight_test_bibliography)
+
+        staged_title = stage_bibitems_batch((subject_close_match,), index, top_n=2, use_rust=False, weights=title_heavy)
+        staged_author = stage_bibitems_batch(
+            (subject_close_match,), index, top_n=2, use_rust=False, weights=author_heavy
+        )
+
+        assert staged_title[0].top_matches[0].matched_bibitem is not staged_author[0].top_matches[0].matched_bibitem
