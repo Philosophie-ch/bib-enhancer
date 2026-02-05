@@ -181,3 +181,43 @@ def subject_partial_match() -> BibItem:
         date={"year": 2023},
         entry_type="article",
     )
+
+
+@pytest.fixture
+def bib_title_strong() -> BibItem:
+    """Great title match with subject_close_match, terrible author match."""
+    return default_bib_item(
+        bibkey={"first_author": "Zzzzz", "date": 2024},
+        title={"latex": "Introduction to Philosophy", "simplified": "Introduction to Philosophy"},
+        author=(
+            {
+                "given_name": {"latex": "Xxxxx", "simplified": "Xxxxx"},
+                "family_name": {"latex": "Zzzzz", "simplified": "Zzzzz"},
+            },
+        ),
+        date={"year": 2024},
+        entry_type="article",
+    )
+
+
+@pytest.fixture
+def bib_author_strong() -> BibItem:
+    """Terrible title match with subject_close_match, great author match."""
+    return default_bib_item(
+        bibkey={"first_author": "Smith", "date": 1990},
+        title={"latex": "Completely Different Topic", "simplified": "Completely Different Topic"},
+        author=(
+            {
+                "given_name": {"latex": "John", "simplified": "John"},
+                "family_name": {"latex": "Smith", "simplified": "Smith"},
+            },
+        ),
+        date={"year": 1990},
+        entry_type="article",
+    )
+
+
+@pytest.fixture
+def weight_test_bibliography(bib_title_strong: BibItem, bib_author_strong: BibItem) -> Tuple[BibItem, ...]:
+    """Bibliography with two items designed to test weight behavior."""
+    return (bib_title_strong, bib_author_strong)

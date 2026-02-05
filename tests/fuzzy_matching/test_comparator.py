@@ -354,3 +354,61 @@ class TestCompareBibitemsDetailed:
         total = sum(ps.weighted_score for ps in result)
         # Identical items should have a very high total score
         assert total > 50
+
+
+# ============================================================================
+# Weight behavior tests (verify weights actually change outcomes)
+# ============================================================================
+
+
+class TestWeightsBehavior:
+    """Tests that different weight configurations produce meaningfully different results."""
+
+    def test_total_score_changes_with_weights(
+        self, bib_smith_philosophy: BibItem, subject_close_match: BibItem
+    ) -> None:
+        """Same pair compared under two different weight configs must yield different totals."""
+        title_heavy: FuzzyMatchWeights = {"title": 0.9, "author": 0.05, "date": 0.025, "bonus": 0.025}
+        author_heavy: FuzzyMatchWeights = {"title": 0.05, "author": 0.9, "date": 0.025, "bonus": 0.025}
+
+        result_title = compare_bibitems_detailed(bib_smith_philosophy, subject_close_match, weights=title_heavy)
+        result_author = compare_bibitems_detailed(bib_smith_philosophy, subject_close_match, weights=author_heavy)
+
+        total_title = sum(ps.weighted_score for ps in result_title)
+        total_author = sum(ps.weighted_score for ps in result_author)
+
+        assert total_title != total_author
+
+    def test_title_heavy_weights_favor_title_match(
+        self,
+        bib_title_strong: BibItem,
+        bib_author_strong: BibItem,
+        subject_close_match: BibItem,
+    ) -> None:
+        """With title-heavy weights, the item with a matching title should score higher."""
+        title_heavy: FuzzyMatchWeights = {"title": 0.9, "author": 0.05, "date": 0.025, "bonus": 0.025}
+
+        scores_title_strong = compare_bibitems_detailed(bib_title_strong, subject_close_match, weights=title_heavy)
+        scores_author_strong = compare_bibitems_detailed(bib_author_strong, subject_close_match, weights=title_heavy)
+
+        total_title_strong = sum(ps.weighted_score for ps in scores_title_strong)
+        total_author_strong = sum(ps.weighted_score for ps in scores_author_strong)
+
+        assert total_title_strong > total_author_strong
+
+    def test_author_heavy_weights_favor_author_match(
+        self,
+        bib_title_strong: BibItem,
+        bib_author_strong: BibItem,
+        subject_close_match: BibItem,
+    ) -> None:
+        """With author-heavy weights, the item with a matching author should score higher."""
+        author_heavy: FuzzyMatchWeights = {"title": 0.05, "author": 0.9, "date": 0.025, "bonus": 0.025}
+
+        scores_title_strong = compare_bibitems_detailed(bib_title_strong, subject_close_match, weights=author_heavy)
+        scores_author_strong = compare_bibitems_detailed(bib_author_strong, subject_close_match, weights=author_heavy)
+
+        total_title_strong = sum(ps.weighted_score for ps in scores_title_strong)
+        total_author_strong = sum(ps.weighted_score for ps in scores_author_strong)
+
+        assert total_author_strong > total_title_strong
