@@ -22,10 +22,10 @@ module-name = "philoch_bib_enhancer._rust"
 
 [tool.poetry.dependencies]
 aletk = "^0.1.8"
-philoch-bib-sdk = "^0.5.0"
-attrs = "^25.3.0"
-pydantic = "^2.10.6"
-polars = "^1.26.0"
+philoch-bib-sdk = "^0.6.1"
+attrs = "^25.4.0"
+pydantic = "^2.12.5"
+polars = "^1.38.0"
 habanero = "^2.2.0"
 libgen-api = "^1.0.1"
 tenacity = "^9.0.0"
@@ -33,11 +33,11 @@ requests = "^2.32.3"
 fastexcel = "^0.14.0"
 pymupdf = "^1.26.7"
 pypdf2 = "^3.0.1"
-cytoolz = "^1.0.1"
+cytoolz = "^1.1.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.5"
-mypy = "^1.15.0"
+mypy = "^1.19.1"
 black = {extras = ["jupyter"], version = "^25.1.0"}
 jupyter = "^1.1.1"
 pytest-env = "^1.1.5"
