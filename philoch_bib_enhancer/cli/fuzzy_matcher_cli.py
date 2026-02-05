@@ -330,7 +330,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--weight-title", type=float, default=None, help="Weight for title scoring (default: 0.5)")
     parser.add_argument("--weight-author", type=float, default=None, help="Weight for author scoring (default: 0.3)")
     parser.add_argument("--weight-date", type=float, default=None, help="Weight for date scoring (default: 0.1)")
-    parser.add_argument("--weight-bonus", type=float, default=None, help="Weight for bonus field scoring (default: 0.1)")
+    parser.add_argument(
+        "--weight-bonus", type=float, default=None, help="Weight for bonus field scoring (default: 0.1)"
+    )
 
     return parser.parse_args()
 

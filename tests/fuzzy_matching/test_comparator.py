@@ -1,0 +1,356 @@
+"""Tests for fuzzy matching comparator scoring functions."""
+
+import pytest
+
+from philoch_bib_sdk.logic.default_models import default_bib_item
+from philoch_bib_sdk.logic.models import BibItem, BibItemDateAttr
+
+from philoch_bib_enhancer.fuzzy_matching.comparator import (
+    _score_author,
+    _score_author_detailed,
+    _score_bonus_fields,
+    _score_date_detailed,
+    _score_title,
+    _score_title_detailed,
+    _score_year,
+    compare_bibitems_detailed,
+)
+from philoch_bib_enhancer.fuzzy_matching.models import (
+    FuzzyMatchWeights,
+    PartialScore,
+    ScoreComponent,
+)
+
+
+# ============================================================================
+# _score_title tests
+# ============================================================================
+
+
+class TestScoreTitle:
+    def test_identical_titles_get_bonus(self) -> None:
+        score = _score_title("Introduction to Philosophy", "Introduction to Philosophy")
+        # fuzzy score of 100 > 85 → +100 bonus
+        assert score > 100
+
+    def test_similar_titles_above_threshold(self) -> None:
+        score = _score_title("Introduction to Philosophy", "Intro to Philosophy")
+        # Should be reasonably high but depends on fuzzy matcher
+        assert score > 0
+
+    def test_completely_different_titles(self) -> None:
+        score = _score_title("Introduction to Philosophy", "Quantum Mechanics and Relativity")
+        assert score < 100  # No bonus
+
+    def test_one_contains_other_triggers_bonus(self) -> None:
+        score = _score_title("Ethics", "Ethics and Morality in Modern Society")
+        # "Ethics" is contained in the longer title → bonus
+        assert score > 100
+
+    def test_errata_mismatch_penalty(self) -> None:
+        score_normal = _score_title("Introduction to Philosophy", "Introduction to Philosophy")
+        score_errata = _score_title("Errata for Introduction to Philosophy", "Introduction to Philosophy")
+        # Errata mismatch should penalize
+        assert score_errata < score_normal
+
+    def test_review_mismatch_penalty(self) -> None:
+        score_normal = _score_title("Ethics and Morality", "Ethics and Morality")
+        score_review = _score_title("A Review of Ethics and Morality", "Ethics and Morality")
+        assert score_review < score_normal
+
+    def test_both_have_errata_no_penalty(self) -> None:
+        """If both titles contain 'errata', symmetric difference is empty → no penalty."""
+        score = _score_title(
+            "Errata for Introduction to Philosophy",
+            "Errata for Introduction to Philosophy",
+        )
+        # Identical titles with same keywords → should get bonus
+        assert score > 100
+
+    def test_empty_title_raises(self) -> None:
+        with pytest.raises(ValueError, match="empty"):
+            _score_title("", "Some Title")
+
+    def test_empty_second_title_raises(self) -> None:
+        with pytest.raises(ValueError, match="empty"):
+            _score_title("Some Title", "")
+
+
+# ============================================================================
+# _score_author tests
+# ============================================================================
+
+
+class TestScoreAuthor:
+    def test_identical_authors_get_bonus(self) -> None:
+        score = _score_author("Smith, John", "Smith, John")
+        assert score > 100  # 100 from fuzzy + 100 bonus
+
+    def test_similar_authors(self) -> None:
+        score = _score_author("Smith, John", "Smith, J.")
+        assert score > 0
+
+    def test_different_authors(self) -> None:
+        score = _score_author("Smith, John", "Doe, Jane")
+        assert score < 100  # No bonus
+
+    def test_empty_author_raises(self) -> None:
+        with pytest.raises(ValueError, match="empty"):
+            _score_author("", "Smith, John")
+
+
+# ============================================================================
+# _score_year tests
+# ============================================================================
+
+
+class TestScoreYear:
+    def test_exact_match(self) -> None:
+        assert _score_year(2024, 2024) == 100
+
+    def test_within_range(self) -> None:
+        assert _score_year(2024, 2025) == 100
+        assert _score_year(2024, 2023) == 100
+
+    def test_outside_range(self) -> None:
+        assert _score_year(2024, 2020) == 0
+
+    def test_custom_range(self) -> None:
+        assert _score_year(2024, 2022, range_offset=2) == 100
+        assert _score_year(2024, 2021, range_offset=2) == 0
+
+
+# ============================================================================
+# _score_title_detailed tests
+# ============================================================================
+
+
+class TestScoreTitleDetailed:
+    def test_default_weight(self) -> None:
+        result = _score_title_detailed("Introduction to Philosophy", "Introduction to Philosophy")
+        assert isinstance(result, PartialScore)
+        assert result.component == ScoreComponent.TITLE
+        assert result.weight == 0.5
+        # score > 100 (fuzzy 100 + bonus 100), weighted = score * 0.5
+        assert result.weighted_score == result.score * 0.5
+
+    def test_custom_weight(self) -> None:
+        result = _score_title_detailed("Introduction to Philosophy", "Introduction to Philosophy", weight=0.8)
+        assert result.weight == 0.8
+        assert result.weighted_score == result.score * 0.8
+
+    def test_empty_titles(self) -> None:
+        result = _score_title_detailed("", "Some Title")
+        assert result.score == 0
+        assert result.weighted_score == 0.0
+        assert "Empty title" in result.details
+
+    def test_bonus_appears_in_details(self) -> None:
+        result = _score_title_detailed("Introduction to Philosophy", "Introduction to Philosophy")
+        assert "bonus" in result.details.lower() or "Fuzzy" in result.details
+
+    def test_keyword_mismatch_appears_in_details(self) -> None:
+        result = _score_title_detailed("Errata for Philosophy", "Philosophy")
+        assert "mismatch" in result.details.lower() or result.score < 200
+
+
+# ============================================================================
+# _score_author_detailed tests
+# ============================================================================
+
+
+class TestScoreAuthorDetailed:
+    def test_default_weight(self) -> None:
+        result = _score_author_detailed("Smith, John", "Smith, John")
+        assert result.component == ScoreComponent.AUTHOR
+        assert result.weight == 0.3
+        assert result.weighted_score == result.score * 0.3
+
+    def test_custom_weight(self) -> None:
+        result = _score_author_detailed("Smith, John", "Smith, John", weight=0.6)
+        assert result.weight == 0.6
+        assert result.weighted_score == result.score * 0.6
+
+    def test_empty_authors(self) -> None:
+        result = _score_author_detailed("", "Smith, John")
+        assert result.score == 0
+        assert "Empty author" in result.details
+
+
+# ============================================================================
+# _score_date_detailed tests
+# ============================================================================
+
+
+class TestScoreDateDetailed:
+    def test_exact_year_match(self) -> None:
+        date1 = BibItemDateAttr(year=2024)
+        date2 = BibItemDateAttr(year=2024)
+        result = _score_date_detailed(date1, date2)
+        assert result.score == 100
+        assert result.component == ScoreComponent.DATE
+        assert "Exact year" in result.details
+
+    def test_one_year_diff(self) -> None:
+        date1 = BibItemDateAttr(year=2024)
+        date2 = BibItemDateAttr(year=2025)
+        result = _score_date_detailed(date1, date2)
+        assert result.score == 90
+
+    def test_two_year_diff(self) -> None:
+        date1 = BibItemDateAttr(year=2024)
+        date2 = BibItemDateAttr(year=2022)
+        result = _score_date_detailed(date1, date2)
+        assert result.score == 80
+
+    def test_three_year_diff(self) -> None:
+        date1 = BibItemDateAttr(year=2024)
+        date2 = BibItemDateAttr(year=2021)
+        result = _score_date_detailed(date1, date2)
+        assert result.score == 70
+
+    def test_same_decade(self) -> None:
+        date1 = BibItemDateAttr(year=2020)
+        date2 = BibItemDateAttr(year=2025)
+        result = _score_date_detailed(date1, date2)
+        assert result.score == 30
+        assert "decade" in result.details.lower()
+
+    def test_different_decades(self) -> None:
+        date1 = BibItemDateAttr(year=2024)
+        date2 = BibItemDateAttr(year=1990)
+        result = _score_date_detailed(date1, date2)
+        assert result.score == 0
+
+    def test_no_date(self) -> None:
+        result = _score_date_detailed("no date", BibItemDateAttr(year=2024))
+        assert result.score == 0
+        assert "Missing date" in result.details
+
+    def test_both_no_date(self) -> None:
+        result = _score_date_detailed("no date", "no date")
+        assert result.score == 0
+
+    def test_custom_weight(self) -> None:
+        date1 = BibItemDateAttr(year=2024)
+        date2 = BibItemDateAttr(year=2024)
+        result = _score_date_detailed(date1, date2, weight=0.2)
+        assert result.weight == 0.2
+        assert result.weighted_score == 100.0 * 0.2
+
+
+# ============================================================================
+# _score_bonus_fields tests
+# ============================================================================
+
+
+class TestScoreBonusFields:
+    def test_doi_exact_match(self, bib_smith_philosophy: BibItem) -> None:
+        subject = default_bib_item(
+            bibkey={"first_author": "X", "date": 2024},
+            title={"latex": "Anything"},
+            entry_type="article",
+            doi="10.1234/phil.2024.001",
+        )
+        result = _score_bonus_fields(bib_smith_philosophy, subject)
+        assert result.score >= 100
+        assert "DOI" in result.details
+
+    def test_journal_volume_number_match(self, bib_smith_philosophy: BibItem) -> None:
+        subject = default_bib_item(
+            bibkey={"first_author": "X", "date": 2024},
+            title={"latex": "Anything"},
+            entry_type="article",
+            journal={"name": {"simplified": "Philosophy Today"}},
+            volume="10",
+            number="2",
+        )
+        result = _score_bonus_fields(bib_smith_philosophy, subject)
+        assert result.score >= 50
+        assert "Journal" in result.details or "Vol" in result.details
+
+    def test_pages_match(self, bib_smith_philosophy: BibItem) -> None:
+        subject = default_bib_item(
+            bibkey={"first_author": "X", "date": 2024},
+            title={"latex": "Anything"},
+            entry_type="article",
+            pages=({"start": "1", "end": "25"},),
+        )
+        result = _score_bonus_fields(bib_smith_philosophy, subject)
+        assert result.score >= 20
+        assert "Page" in result.details or "page" in result.details
+
+    def test_publisher_match(self, bib_smith_philosophy: BibItem) -> None:
+        subject = default_bib_item(
+            bibkey={"first_author": "X", "date": 2024},
+            title={"latex": "Anything"},
+            entry_type="article",
+            publisher={"simplified": "Academic Press"},
+        )
+        result = _score_bonus_fields(bib_smith_philosophy, subject)
+        assert result.score >= 10
+        assert "Publisher" in result.details or "publisher" in result.details
+
+    def test_no_bonus_matches(self) -> None:
+        ref = default_bib_item(bibkey={"first_author": "A", "date": 2024}, title={"latex": "T1"}, entry_type="misc")
+        subj = default_bib_item(bibkey={"first_author": "B", "date": 2024}, title={"latex": "T2"}, entry_type="misc")
+        result = _score_bonus_fields(ref, subj)
+        assert result.score == 0
+        assert "No bonus" in result.details
+
+    def test_combined_bonuses(self, bib_smith_philosophy: BibItem) -> None:
+        """Subject matching on DOI + pages + publisher should accumulate."""
+        subject = default_bib_item(
+            bibkey={"first_author": "X", "date": 2024},
+            title={"latex": "Anything"},
+            entry_type="article",
+            doi="10.1234/phil.2024.001",
+            pages=({"start": "1", "end": "25"},),
+            publisher={"simplified": "Academic Press"},
+        )
+        result = _score_bonus_fields(bib_smith_philosophy, subject)
+        # DOI(100) + Pages(20) + Publisher(10) = 130
+        assert result.score >= 130
+
+
+# ============================================================================
+# compare_bibitems_detailed tests
+# ============================================================================
+
+
+class TestCompareBibitemsDetailed:
+    def test_returns_four_partial_scores(self, bib_smith_philosophy: BibItem, subject_close_match: BibItem) -> None:
+        result = compare_bibitems_detailed(bib_smith_philosophy, subject_close_match)
+        assert len(result) == 4
+        assert all(isinstance(ps, PartialScore) for ps in result)
+
+    def test_component_order(self, bib_smith_philosophy: BibItem, subject_close_match: BibItem) -> None:
+        result = compare_bibitems_detailed(bib_smith_philosophy, subject_close_match)
+        assert result[0].component == ScoreComponent.TITLE
+        assert result[1].component == ScoreComponent.AUTHOR
+        assert result[2].component == ScoreComponent.DATE
+        assert result[3].component == ScoreComponent.PUBLISHER  # bonus uses PUBLISHER
+
+    def test_default_weights_applied(self, bib_smith_philosophy: BibItem, subject_close_match: BibItem) -> None:
+        result = compare_bibitems_detailed(bib_smith_philosophy, subject_close_match)
+        assert result[0].weight == 0.5  # title
+        assert result[1].weight == 0.3  # author
+        assert result[2].weight == 0.1  # date
+        assert result[3].weight == 0.1  # bonus
+
+    def test_custom_weights_applied(self, bib_smith_philosophy: BibItem, subject_close_match: BibItem) -> None:
+        custom_weights: FuzzyMatchWeights = {
+            "title": 0.4,
+            "author": 0.4,
+            "date": 0.1,
+            "bonus": 0.1,
+        }
+        result = compare_bibitems_detailed(bib_smith_philosophy, subject_close_match, weights=custom_weights)
+        assert result[0].weight == 0.4
+        assert result[1].weight == 0.4
+
+    def test_identical_items_high_total(self, bib_smith_philosophy: BibItem) -> None:
+        result = compare_bibitems_detailed(bib_smith_philosophy, bib_smith_philosophy)
+        total = sum(ps.weighted_score for ps in result)
+        # Identical items should have a very high total score
+        assert total > 50
