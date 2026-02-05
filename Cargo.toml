@@ -1,0 +1,32 @@
+[package]
+name = "philoch_bib_enhancer"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "_rust"
+crate-type = ["cdylib"]
+
+[dependencies]
+pyo3 = "0.25.0"
+ahash = "0.8"
+rayon = "1.11.0"
+strsim = "0.11.1"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+
+[lints.clippy]
+all = "warn"
+cast_possible_truncation = "warn"
+cast_sign_loss = "warn"
+cast_possible_wrap = "warn"
+cast_lossless = "warn"
+redundant_clone = "warn"
+checked_conversions = "warn"
+fallible_impl_from = "warn"
+
+[lints.rust]
+warnings = "deny"
