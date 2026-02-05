@@ -80,10 +80,7 @@ def parse_page_items(html: str) -> list[ParsedPageItem]:
 
     list_items = soup.find_all('li', class_='element-list')
 
-    for li_elem in list_items:
-        if not isinstance(li_elem, Tag):
-            continue
-        li: Tag = li_elem
+    for li in list_items:
         # Get item ID
         hidden_input = li.find('input', {'name': 'id-item'})
         if not hidden_input or not isinstance(hidden_input, Tag):
