@@ -2,7 +2,7 @@ use pyo3::prelude::*;
 use pyo3::types::{PyDict, PyList};
 use rayon::prelude::*;
 use std::cmp::Ordering;
-use std::collections::{BinaryHeap, HashSet};
+use std::collections::{BinaryHeap, HashMap, HashSet};
 use strsim::jaro_winkler;
 
 /// Input data for a single bibliographic item
@@ -199,8 +199,17 @@ fn token_sort_ratio_f64(s1: &str, s2: &str) -> f64 {
     let norm1 = normalize(s1);
     let norm2 = normalize(s2);
 
-    let sorted1 = tokenize_and_sort(&norm1).join(" ");
-    let sorted2 = tokenize_and_sort(&norm2).join(" ");
+    token_sort_ratio_f64_prenormalized(&norm1, &norm2)
+}
+
+/// Token sort ratio on already-normalized strings (avoids double normalization)
+fn token_sort_ratio_f64_prenormalized(norm1: &str, norm2: &str) -> f64 {
+    if norm1.is_empty() || norm2.is_empty() {
+        return 0.0;
+    }
+
+    let sorted1 = tokenize_and_sort(norm1).join(" ");
+    let sorted2 = tokenize_and_sort(norm2).join(" ");
 
     // Jaro-Winkler returns 0.0-1.0, scale to 0-100
     jaro_winkler(&sorted1, &sorted2) * 100.0
@@ -261,26 +270,25 @@ impl Ord for MatchResult {
     }
 }
 
-/// Score title similarity with bonuses
-fn score_title(title1: &str, title2: &str, weight: f64) -> f64 {
-    if title1.is_empty() || title2.is_empty() {
+/// Score title similarity with bonuses (takes pre-normalized title for subject)
+fn score_title_prenorm(norm_subject: &str, title2: &str, weight: f64) -> f64 {
+    if norm_subject.is_empty() || title2.is_empty() {
         return 0.0;
     }
 
-    let norm1 = normalize(title1);
     let norm2 = normalize(title2);
 
-    let raw_score = token_sort_ratio_f64(&norm1, &norm2);
+    let raw_score = token_sort_ratio_f64_prenormalized(norm_subject, &norm2);
 
     // Check if one title contains the other (subtitle handling)
-    let one_contains_other = norm1.contains(&norm2) || norm2.contains(&norm1);
+    let one_contains_other = norm_subject.contains(&norm2) || norm2.contains(norm_subject);
 
-    // Check for undesired keywords mismatch
-    let undesired = ["errata", "review"];
-    let has_undesired1: Vec<_> = undesired.iter().filter(|kw| norm1.contains(*kw)).collect();
-    let has_undesired2: Vec<_> = undesired.iter().filter(|kw| norm2.contains(*kw)).collect();
-    let kw_mismatch = has_undesired1.len() != has_undesired2.len()
-        || has_undesired1.iter().any(|kw| !has_undesired2.contains(kw));
+    // Check for undesired keywords mismatch (no allocation version)
+    let has_errata1 = norm_subject.contains("errata");
+    let has_errata2 = norm2.contains("errata");
+    let has_review1 = norm_subject.contains("review");
+    let has_review2 = norm2.contains("review");
+    let kw_mismatch = has_errata1 != has_errata2 || has_review1 != has_review2;
 
     let mut final_score = raw_score;
 
@@ -291,18 +299,28 @@ fn score_title(title1: &str, title2: &str, weight: f64) -> f64 {
 
     // Penalty for keyword mismatch
     if kw_mismatch {
-        // penalty_count is at most 2 (size of undesired array), safe to multiply directly
-        let penalty_count = has_undesired1.len().abs_diff(has_undesired2.len());
-        final_score -= (penalty_count * 50) as f64;
+        let penalty_count =
+            i32::from(has_errata1 != has_errata2) + i32::from(has_review1 != has_review2);
+        final_score -= f64::from(penalty_count * 50);
     }
 
     final_score.max(0.0) * weight
 }
 
+/// Score title similarity with bonuses (normalizes both titles)
+fn score_title(title1: &str, title2: &str, weight: f64) -> f64 {
+    if title1.is_empty() || title2.is_empty() {
+        return 0.0;
+    }
+
+    let norm1 = normalize(title1);
+    score_title_prenorm(&norm1, title2, weight)
+}
+
 /// Check if a name part is an initial (e.g., "E." or "E")
 fn is_initial(name: &str) -> bool {
     let cleaned = name.trim_end_matches('.');
-    cleaned.len() == 1 && cleaned.chars().next().map_or(false, |c| c.is_alphabetic())
+    cleaned.len() == 1 && cleaned.chars().next().is_some_and(|c| c.is_alphabetic())
 }
 
 /// Get the uppercase initial letter from a name part
@@ -340,10 +358,7 @@ fn check_initials_match(author1: &str, author2: &str) -> bool {
     }
 
     // Fuzzy surname check (only call once, not in loop)
-    let surname_score = token_sort_ratio_f64(
-        &surname1.to_lowercase(),
-        &surname2.to_lowercase(),
-    );
+    let surname_score = token_sort_ratio_f64(&surname1.to_lowercase(), &surname2.to_lowercase());
     if surname_score < 80.0 {
         return false;
     }
@@ -477,6 +492,62 @@ fn score_bonus(subject: &BibItemData, candidate: &BibItemData, weight: f64) -> f
     bonus * weight
 }
 
+/// Score bonus fields with precomputed subject data (avoids repeated normalization)
+fn score_bonus_precomputed(
+    subject: &PrecomputedSubject,
+    candidate: &BibItemData,
+    weight: f64,
+) -> f64 {
+    let mut bonus = 0.0;
+
+    // DOI exact match (highest confidence)
+    if let (Some(ref doi1), Some(ref doi2)) = (&subject.data.doi, &candidate.doi) {
+        if !doi1.is_empty() && doi1 == doi2 {
+            bonus += 100.0;
+        }
+    }
+
+    // Journal + Volume + Number match (use precomputed normalized journal)
+    if let (Some(ref norm_j1), Some(ref j2)) = (&subject.normalized_journal, &candidate.journal) {
+        let norm_j2 = normalize(j2);
+        if !norm_j1.is_empty() && norm_j1 == &norm_j2 {
+            let vol_match = match (&subject.data.volume, &candidate.volume) {
+                (Some(v1), Some(v2)) => !v1.is_empty() && v1 == v2,
+                _ => false,
+            };
+            let num_match = match (&subject.data.number, &candidate.number) {
+                (Some(n1), Some(n2)) => !n1.is_empty() && n1 == n2,
+                _ => false,
+            };
+            if vol_match && num_match {
+                bonus += 50.0;
+            }
+        }
+    }
+
+    // Pages match
+    if let (Some(ref p1), Some(ref p2)) = (&subject.data.pages, &candidate.pages) {
+        if !p1.is_empty() && p1 == p2 {
+            bonus += 20.0;
+        }
+    }
+
+    // Publisher match (use precomputed normalized publisher)
+    if let (Some(ref norm_pub1), Some(ref pub2)) =
+        (&subject.normalized_publisher, &candidate.publisher)
+    {
+        if !norm_pub1.is_empty() && !pub2.is_empty() {
+            let norm_pub2 = normalize(pub2);
+            let pub_score = token_sort_ratio_f64_prenormalized(norm_pub1, &norm_pub2);
+            if pub_score > 85.0 {
+                bonus += 10.0;
+            }
+        }
+    }
+
+    bonus * weight
+}
+
 /// Scoring weights for the four matching components.
 /// Mirrors the Python FuzzyMatchWeights TypedDict — passed as a dict from Python.
 #[derive(Clone, Copy, Debug, FromPyObject)]
@@ -489,6 +560,27 @@ struct Weights {
     date: f64,
     #[pyo3(item)]
     bonus: f64,
+}
+
+/// Precomputed data for a subject to avoid recomputation per candidate
+struct PrecomputedSubject<'a> {
+    data: &'a BibItemData,
+    has_academic_prefix: bool,
+    normalized_title: String,
+    normalized_journal: Option<String>,
+    normalized_publisher: Option<String>,
+}
+
+impl<'a> PrecomputedSubject<'a> {
+    fn new(data: &'a BibItemData) -> Self {
+        Self {
+            data,
+            has_academic_prefix: has_academic_prefix(&data.title),
+            normalized_title: normalize(&data.title),
+            normalized_journal: data.journal.as_ref().map(|j| normalize(j)),
+            normalized_publisher: data.publisher.as_ref().map(|p| normalize(p)),
+        }
+    }
 }
 
 /// Score a single candidate against a subject with configurable weights
@@ -515,6 +607,44 @@ fn score_candidate(
     let author_score = score_author(&subject.author, &candidate.author, weights.author);
     let date_score = score_date(subject.year, candidate.year, weights.date);
     let bonus_score = score_bonus(subject, candidate, weights.bonus);
+
+    let total_score = title_score + author_score + date_score + bonus_score;
+
+    MatchResult {
+        candidate_index: candidate.index,
+        total_score,
+        title_score,
+        author_score,
+        date_score,
+        bonus_score,
+    }
+}
+
+/// Score a single candidate against precomputed subject data (optimized)
+fn score_candidate_precomputed(
+    subject: &PrecomputedSubject,
+    candidate: &BibItemData,
+    weights: &Weights,
+) -> MatchResult {
+    // Academic prefix gate using precomputed subject prefix
+    let candidate_has_prefix = has_academic_prefix(&candidate.title);
+    if subject.has_academic_prefix != candidate_has_prefix {
+        return MatchResult {
+            candidate_index: candidate.index,
+            total_score: 0.0,
+            title_score: 0.0,
+            author_score: 0.0,
+            date_score: 0.0,
+            bonus_score: 0.0,
+        };
+    }
+
+    // Use precomputed normalized title
+    let title_score =
+        score_title_prenorm(&subject.normalized_title, &candidate.title, weights.title);
+    let author_score = score_author(&subject.data.author, &candidate.author, weights.author);
+    let date_score = score_date(subject.data.year, candidate.year, weights.date);
+    let bonus_score = score_bonus_precomputed(subject, candidate, weights.bonus);
 
     let total_score = title_score + author_score + date_score + bonus_score;
 
@@ -580,6 +710,71 @@ struct SubjectMatchResult {
     candidates_searched: usize,
 }
 
+/// Blocking index data passed from Python for efficient candidate filtering
+#[derive(Debug, FromPyObject)]
+struct BlockingIndexData {
+    #[pyo3(item)]
+    doi_index: HashMap<String, usize>,
+    #[pyo3(item)]
+    trigram_index: HashMap<String, Vec<usize>>,
+    #[pyo3(item)]
+    surname_index: HashMap<String, Vec<usize>>,
+    #[pyo3(item)]
+    decade_index: HashMap<i32, Vec<usize>>,
+}
+
+/// Get candidate indices for a subject using the blocking index
+fn get_candidate_indices(
+    subject: &BibItemData,
+    index: &BlockingIndexData,
+    num_candidates: usize,
+) -> Vec<usize> {
+    // DOI exact match - return immediately
+    if let Some(ref doi) = subject.doi {
+        if !doi.is_empty() {
+            if let Some(&idx) = index.doi_index.get(doi) {
+                return vec![idx];
+            }
+        }
+    }
+
+    let mut indices: HashSet<usize> = HashSet::new();
+
+    // Title trigrams
+    let trigrams = extract_trigrams(&subject.title);
+    for trigram in trigrams {
+        if let Some(idxs) = index.trigram_index.get(&trigram) {
+            indices.extend(idxs);
+        }
+    }
+
+    // Author surnames - check if any indexed surname appears in the author string
+    let author_lower = subject.author.to_lowercase();
+    for (surname, idxs) in &index.surname_index {
+        if author_lower.contains(surname) {
+            indices.extend(idxs);
+        }
+    }
+
+    // Year decades (±5 decades = ±50 years)
+    if let Some(year) = subject.year {
+        let subject_decade = (year / 10) * 10;
+        for offset in -5..=5 {
+            let decade = subject_decade + (offset * 10);
+            if let Some(idxs) = index.decade_index.get(&decade) {
+                indices.extend(idxs);
+            }
+        }
+    }
+
+    // Fallback to all if no candidates found
+    if indices.is_empty() {
+        return (0..num_candidates).collect();
+    }
+
+    indices.into_iter().collect()
+}
+
 /// Batch score multiple subjects against candidates in parallel.
 #[pyfunction]
 fn score_batch(
@@ -605,6 +800,106 @@ fn score_batch(
         .collect()
 }
 
+/// Find top matches using precomputed subject and filtered candidate indices
+fn find_top_matches_indexed(
+    subject: &PrecomputedSubject,
+    candidates: &[BibItemData],
+    candidate_indices: &[usize],
+    doi_map: &HashMap<&str, usize>,
+    top_n: usize,
+    min_score: f64,
+    weights: &Weights,
+) -> (Vec<MatchResult>, usize) {
+    // Quick DOI check using prebuilt map (O(1) instead of O(n))
+    if let Some(ref subject_doi) = subject.data.doi {
+        if !subject_doi.is_empty() {
+            if let Some(&cand_idx) = doi_map.get(subject_doi.as_str()) {
+                let result = score_candidate_precomputed(subject, &candidates[cand_idx], weights);
+                return (vec![result], 1);
+            }
+        }
+    }
+
+    // Score only the filtered candidates
+    let mut heap: BinaryHeap<MatchResult> = BinaryHeap::new();
+
+    for &cand_idx in candidate_indices {
+        if cand_idx < candidates.len() {
+            let result = score_candidate_precomputed(subject, &candidates[cand_idx], weights);
+            if result.total_score >= min_score {
+                heap.push(result);
+            }
+        }
+    }
+
+    // Extract top N
+    let searched = candidate_indices.len();
+    let mut results: Vec<MatchResult> = Vec::with_capacity(top_n.min(heap.len()));
+    for _ in 0..top_n {
+        if let Some(result) = heap.pop() {
+            results.push(result);
+        } else {
+            break;
+        }
+    }
+
+    (results, searched)
+}
+
+/// Batch score with blocking index - filters candidates per subject for massive speedup.
+/// This is the primary entry point for fuzzy matching.
+#[pyfunction]
+fn score_batch_indexed(
+    subjects: Vec<BibItemData>,
+    candidates: Vec<BibItemData>,
+    index: BlockingIndexData,
+    top_n: usize,
+    min_score: f64,
+    weights: Weights,
+) -> Vec<SubjectMatchResult> {
+    let num_candidates = candidates.len();
+
+    // Build DOI map once for O(1) lookups
+    let doi_map: HashMap<&str, usize> = candidates
+        .iter()
+        .filter_map(|c| {
+            c.doi
+                .as_ref()
+                .filter(|d| !d.is_empty())
+                .map(|d| (d.as_str(), c.index))
+        })
+        .collect();
+
+    subjects
+        .par_iter()
+        .enumerate()
+        .map(|(idx, subject)| {
+            // Precompute subject data once
+            let precomputed = PrecomputedSubject::new(subject);
+
+            // Get filtered candidate indices from blocking index
+            let candidate_indices = get_candidate_indices(subject, &index, num_candidates);
+
+            // Score only filtered candidates
+            let (matches, searched) = find_top_matches_indexed(
+                &precomputed,
+                &candidates,
+                &candidate_indices,
+                &doi_map,
+                top_n,
+                min_score,
+                &weights,
+            );
+
+            SubjectMatchResult {
+                subject_index: idx,
+                matches,
+                candidates_searched: searched,
+            }
+        })
+        .collect()
+}
+
 // === END SCORER FUNCTIONALITY ===
 
 /// A simple test function to verify Rust integration works
@@ -622,6 +917,7 @@ fn _rust(m: &Bound<'_, PyModule>) -> PyResult<()> {
     // Scorer functions (merged from rust_scorer)
     m.add_function(wrap_pyfunction!(token_sort_ratio, m)?)?;
     m.add_function(wrap_pyfunction!(score_batch, m)?)?;
+    m.add_function(wrap_pyfunction!(score_batch_indexed, m)?)?;
     Ok(())
 }
 
