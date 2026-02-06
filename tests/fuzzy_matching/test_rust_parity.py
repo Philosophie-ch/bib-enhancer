@@ -144,9 +144,9 @@ class TestRustPythonParity:
         assert len(results) == len(subjects)
 
     def test_rust_scorer_metadata(self, bibliography: Tuple[BibItem, ...], subjects: Tuple[BibItem, ...]) -> None:
-        """Rust scorer should report 'rust' in metadata."""
+        """Rust scorer should report 'rust_indexed' in metadata."""
         index = build_index(bibliography)
         results = stage_bibitems_batch(subjects, index, top_n=2)
 
         for staged in results:
-            assert staged.search_metadata.get("scorer") == "rust"
+            assert staged.search_metadata.get("scorer") == "rust_indexed"

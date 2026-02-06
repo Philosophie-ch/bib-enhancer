@@ -71,7 +71,7 @@ from philoch_bib_enhancer.fuzzy_matching.matcher import (
     stage_bibitems_batch,
     BibItemBlockIndex,
 )
-from philoch_bib_enhancer.fuzzy_matching.models import BibItemStaged, FuzzyMatchWeights, Match
+from philoch_bib_enhancer.fuzzy_matching.models import FuzzyMatchWeights, Match
 
 
 # ============================================================================
@@ -363,7 +363,9 @@ class TestPhilStudiesBenchmark:
         precision = compute_precision_at_1(results)
 
         print(f"\nPrecision@1 (default weights): {precision:.2%}")
-        print(f"  Correct at rank 1: {int(precision * len([r for r in results if r['case']['annotation_type'] in ('RIGHT_KEY', 'WRONG_KEY')]))}")
+        print(
+            f"  Correct at rank 1: {int(precision * len([r for r in results if r['case']['annotation_type'] in ('RIGHT_KEY', 'WRONG_KEY')]))}"
+        )
 
         # Baseline: 95% (tuned defaults achieve 95.49% on benchmark)
         assert precision >= 0.95, f"Precision@1 {precision:.2%} below baseline 95%"
@@ -398,7 +400,9 @@ class TestPhilStudiesBenchmark:
         right_median = stats.get("RIGHT_KEY", {}).get("median", 0)
         not_in_median = stats.get("NOT_IN_BIBLIO", {}).get("median", 0)
 
-        assert right_median > not_in_median, f"RIGHT_KEY median ({right_median:.2f}) should be > NOT_IN_BIBLIO median ({not_in_median:.2f})"
+        assert (
+            right_median > not_in_median
+        ), f"RIGHT_KEY median ({right_median:.2f}) should be > NOT_IN_BIBLIO median ({not_in_median:.2f})"
 
     def test_mrr(
         self,
@@ -444,7 +448,9 @@ class TestWeightComparison:
         mrr = compute_mrr(results)
 
         print(f"\n{name}: P@1={precision:.2%}, R@5={recall:.2%}, MRR={mrr:.4f}")
-        print(f"  Weights: title={weights['title']}, author={weights['author']}, date={weights['date']}, bonus={weights['bonus']}")
+        print(
+            f"  Weights: title={weights['title']}, author={weights['author']}, date={weights['date']}, bonus={weights['bonus']}"
+        )
 
         # Just report, don't assert (this is for comparison)
         assert True

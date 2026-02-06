@@ -18,7 +18,6 @@ from philoch_bib_enhancer.fuzzy_matching.matcher import (
 from philoch_bib_enhancer.fuzzy_matching.models import (
     BibItemStaged,
     FuzzyMatchWeights,
-    Match,
 )
 
 

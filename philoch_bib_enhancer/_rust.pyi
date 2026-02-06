@@ -103,6 +103,14 @@ class Weights(TypedDict):
     date: float
     bonus: float
 
+class BlockingIndexData(TypedDict):
+    """Blocking index data for efficient candidate filtering in Rust."""
+
+    doi_index: dict[str, int]
+    trigram_index: dict[str, list[int]]
+    surname_index: dict[str, list[int]]
+    decade_index: dict[int, list[int]]
+
 def score_batch(
     subjects: list[BibItemData],
     candidates: list[BibItemData],
@@ -115,6 +123,32 @@ def score_batch(
     Args:
         subjects: List of BibItems to find matches for
         candidates: List of BibItems to match against
+        top_n: Maximum number of matches to return per subject
+        min_score: Minimum score threshold for matches
+        weights: Dict with title, author, date, bonus weight floats
+
+    Returns:
+        List of results, one per subject, containing top matches
+    """
+    ...
+
+def score_batch_indexed(
+    subjects: list[BibItemData],
+    candidates: list[BibItemData],
+    index: BlockingIndexData,
+    top_n: int,
+    min_score: float,
+    weights: Weights,
+) -> list[SubjectMatchResult]:
+    """Batch score with blocking index - filters candidates per subject for massive speedup.
+
+    Uses the blocking index to filter candidates per-subject in Rust,
+    scoring only relevant candidates (~0.5-2% of total) for 10-100x speedup.
+
+    Args:
+        subjects: List of BibItems to find matches for
+        candidates: List of all candidate BibItems
+        index: Blocking index data with trigram, surname, decade mappings
         top_n: Maximum number of matches to return per subject
         min_score: Minimum score threshold for matches
         weights: Dict with title, author, date, bonus weight floats
