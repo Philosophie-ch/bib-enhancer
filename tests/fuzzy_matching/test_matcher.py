@@ -13,8 +13,6 @@ from philoch_bib_enhancer.fuzzy_matching.matcher import (
     _get_candidate_set,
     _get_decade,
     build_index,
-    find_similar_bibitems,
-    stage_bibitem,
     stage_bibitems_batch,
 )
 from philoch_bib_enhancer.fuzzy_matching.models import (
@@ -205,105 +203,7 @@ class TestGetCandidateSet:
 
 
 # ============================================================================
-# find_similar_bibitems tests
-# ============================================================================
-
-
-class TestFindSimilarBibitems:
-    def test_returns_sorted_matches(
-        self,
-        sample_bibliography: Tuple[BibItem, ...],
-        subject_close_match: BibItem,
-    ) -> None:
-        index = build_index(sample_bibliography)
-        matches = find_similar_bibitems(subject_close_match, index, top_n=3)
-        assert all(isinstance(m, Match) for m in matches)
-        # Verify descending order
-        for i in range(len(matches) - 1):
-            assert matches[i].total_score >= matches[i + 1].total_score
-
-    def test_top_n_limits_results(
-        self,
-        sample_bibliography: Tuple[BibItem, ...],
-        subject_close_match: BibItem,
-    ) -> None:
-        index = build_index(sample_bibliography)
-        matches = find_similar_bibitems(subject_close_match, index, top_n=1)
-        assert len(matches) <= 1
-
-    def test_min_score_filters(
-        self,
-        sample_bibliography: Tuple[BibItem, ...],
-        subject_close_match: BibItem,
-    ) -> None:
-        index = build_index(sample_bibliography)
-        # Very high min_score should filter most results
-        matches = find_similar_bibitems(subject_close_match, index, min_score=9999.0)
-        assert len(matches) == 0
-
-    def test_ranks_are_sequential(
-        self,
-        sample_bibliography: Tuple[BibItem, ...],
-        subject_close_match: BibItem,
-    ) -> None:
-        index = build_index(sample_bibliography)
-        matches = find_similar_bibitems(subject_close_match, index, top_n=3)
-        for i, match in enumerate(matches, start=1):
-            assert match.rank == i
-
-    def test_custom_weights(
-        self,
-        sample_bibliography: Tuple[BibItem, ...],
-        subject_close_match: BibItem,
-    ) -> None:
-        index = build_index(sample_bibliography)
-        # All weight on title
-        weights: FuzzyMatchWeights = {"title": 1.0, "author": 0.0, "date": 0.0, "bonus": 0.0}
-        matches = find_similar_bibitems(subject_close_match, index, top_n=3, weights=weights)
-        # Should still work and return results
-        assert len(matches) >= 1
-
-
-# ============================================================================
-# stage_bibitem tests
-# ============================================================================
-
-
-class TestStageBibitem:
-    def test_returns_staged_item(
-        self,
-        sample_bibliography: Tuple[BibItem, ...],
-        subject_close_match: BibItem,
-    ) -> None:
-        index = build_index(sample_bibliography)
-        staged = stage_bibitem(subject_close_match, index)
-        assert isinstance(staged, BibItemStaged)
-        assert staged.bibitem is subject_close_match
-
-    def test_has_search_metadata(
-        self,
-        sample_bibliography: Tuple[BibItem, ...],
-        subject_close_match: BibItem,
-    ) -> None:
-        index = build_index(sample_bibliography)
-        staged = stage_bibitem(subject_close_match, index)
-        assert "search_time_ms" in staged.search_metadata
-        assert "candidates_searched" in staged.search_metadata
-        assert staged.search_metadata["candidates_searched"] >= 1
-
-    def test_has_top_matches(
-        self,
-        sample_bibliography: Tuple[BibItem, ...],
-        subject_close_match: BibItem,
-    ) -> None:
-        index = build_index(sample_bibliography)
-        staged = stage_bibitem(subject_close_match, index, top_n=2)
-        assert len(staged.top_matches) <= 2
-        assert all(isinstance(m, Match) for m in staged.top_matches)
-
-
-# ============================================================================
-# stage_bibitems_batch tests (Python path)
+# stage_bibitems_batch tests
 # ============================================================================
 
 
@@ -316,16 +216,16 @@ class TestStageBibitemsBatch:
     ) -> None:
         index = build_index(sample_bibliography)
         subjects = (subject_close_match, subject_partial_match)
-        staged = stage_bibitems_batch(subjects, index, top_n=2, use_rust=False)
+        staged = stage_bibitems_batch(subjects, index, top_n=2)
         assert len(staged) == 2
 
-    def test_batch_python_results(
+    def test_batch_results(
         self,
         sample_bibliography: Tuple[BibItem, ...],
         subject_close_match: BibItem,
     ) -> None:
         index = build_index(sample_bibliography)
-        staged = stage_bibitems_batch((subject_close_match,), index, top_n=3, use_rust=False)
+        staged = stage_bibitems_batch((subject_close_match,), index, top_n=3)
         assert len(staged) == 1
         assert isinstance(staged[0], BibItemStaged)
         assert len(staged[0].top_matches) <= 3
@@ -337,7 +237,7 @@ class TestStageBibitemsBatch:
     ) -> None:
         index = build_index(sample_bibliography)
         weights: FuzzyMatchWeights = {"title": 0.7, "author": 0.1, "date": 0.1, "bonus": 0.1}
-        staged = stage_bibitems_batch((subject_close_match,), index, top_n=2, use_rust=False, weights=weights)
+        staged = stage_bibitems_batch((subject_close_match,), index, top_n=2, weights=weights)
         assert len(staged) == 1
 
 
@@ -358,7 +258,8 @@ class TestWeightsBehavior:
         """With title-heavy weights, the title-matching item should be rank 1."""
         title_heavy: FuzzyMatchWeights = {"title": 0.9, "author": 0.05, "date": 0.025, "bonus": 0.025}
         index = build_index(weight_test_bibliography)
-        matches = find_similar_bibitems(subject_close_match, index, top_n=2, weights=title_heavy)
+        staged = stage_bibitems_batch((subject_close_match,), index, top_n=2, weights=title_heavy)
+        matches = staged[0].top_matches
         assert len(matches) >= 1
         assert matches[0].matched_bibitem is bib_title_strong
 
@@ -371,7 +272,8 @@ class TestWeightsBehavior:
         """With author-heavy weights, the author-matching item should be rank 1."""
         author_heavy: FuzzyMatchWeights = {"title": 0.05, "author": 0.9, "date": 0.025, "bonus": 0.025}
         index = build_index(weight_test_bibliography)
-        matches = find_similar_bibitems(subject_close_match, index, top_n=2, weights=author_heavy)
+        staged = stage_bibitems_batch((subject_close_match,), index, top_n=2, weights=author_heavy)
+        matches = staged[0].top_matches
         assert len(matches) >= 1
         assert matches[0].matched_bibitem is bib_author_strong
 
@@ -385,24 +287,22 @@ class TestWeightsBehavior:
         author_heavy: FuzzyMatchWeights = {"title": 0.05, "author": 0.9, "date": 0.025, "bonus": 0.025}
         index = build_index(weight_test_bibliography)
 
-        matches_title = find_similar_bibitems(subject_close_match, index, top_n=2, weights=title_heavy)
-        matches_author = find_similar_bibitems(subject_close_match, index, top_n=2, weights=author_heavy)
+        staged_title = stage_bibitems_batch((subject_close_match,), index, top_n=2, weights=title_heavy)
+        staged_author = stage_bibitems_batch((subject_close_match,), index, top_n=2, weights=author_heavy)
 
-        assert matches_title[0].matched_bibitem is not matches_author[0].matched_bibitem
+        assert staged_title[0].top_matches[0].matched_bibitem is not staged_author[0].top_matches[0].matched_bibitem
 
     def test_batch_weights_flip_ranking(
         self,
         weight_test_bibliography: Tuple[BibItem, ...],
         subject_close_match: BibItem,
     ) -> None:
-        """Same ranking flip should work through the batch API (Python path)."""
+        """Ranking flip works through the batch API."""
         title_heavy: FuzzyMatchWeights = {"title": 0.9, "author": 0.05, "date": 0.025, "bonus": 0.025}
         author_heavy: FuzzyMatchWeights = {"title": 0.05, "author": 0.9, "date": 0.025, "bonus": 0.025}
         index = build_index(weight_test_bibliography)
 
-        staged_title = stage_bibitems_batch((subject_close_match,), index, top_n=2, use_rust=False, weights=title_heavy)
-        staged_author = stage_bibitems_batch(
-            (subject_close_match,), index, top_n=2, use_rust=False, weights=author_heavy
-        )
+        staged_title = stage_bibitems_batch((subject_close_match,), index, top_n=2, weights=title_heavy)
+        staged_author = stage_bibitems_batch((subject_close_match,), index, top_n=2, weights=author_heavy)
 
         assert staged_title[0].top_matches[0].matched_bibitem is not staged_author[0].top_matches[0].matched_bibitem

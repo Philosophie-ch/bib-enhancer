@@ -113,60 +113,40 @@ class TestRustPythonParity:
             ),
         )
 
-    def test_both_return_same_count(self, bibliography: Tuple[BibItem, ...], subjects: Tuple[BibItem, ...]) -> None:
+    def test_returns_correct_count(self, bibliography: Tuple[BibItem, ...], subjects: Tuple[BibItem, ...]) -> None:
         index = build_index(bibliography)
+        results = stage_bibitems_batch(subjects, index, top_n=3)
+        assert len(results) == len(subjects)
 
-        rust_results = stage_bibitems_batch(subjects, index, top_n=3, use_rust=True)
-        python_results = stage_bibitems_batch(subjects, index, top_n=3, use_rust=False)
-
-        assert len(rust_results) == len(python_results) == len(subjects)
-
-    def test_top1_match_agrees(self, bibliography: Tuple[BibItem, ...], subjects: Tuple[BibItem, ...]) -> None:
-        """Both scorers should agree on the best match for each subject."""
+    def test_top1_match_exists(self, bibliography: Tuple[BibItem, ...], subjects: Tuple[BibItem, ...]) -> None:
+        """Rust scorer should return at least one match for each subject."""
         index = build_index(bibliography)
+        results = stage_bibitems_batch(subjects, index, top_n=1)
 
-        rust_results = stage_bibitems_batch(subjects, index, top_n=1, use_rust=True)
-        python_results = stage_bibitems_batch(subjects, index, top_n=1, use_rust=False)
+        for staged in results:
+            assert len(staged.top_matches) >= 1
+            assert staged.top_matches[0].bibkey
 
-        for rust_staged, python_staged in zip(rust_results, python_results):
-            if rust_staged.top_matches and python_staged.top_matches:
-                rust_best = rust_staged.top_matches[0].bibkey
-                python_best = python_staged.top_matches[0].bibkey
-                assert rust_best == python_best, f"Top match disagreement: Rust={rust_best}, Python={python_best}"
-
-    def test_scores_have_same_sign(self, bibliography: Tuple[BibItem, ...], subjects: Tuple[BibItem, ...]) -> None:
-        """Both scorers should produce non-negative scores."""
+    def test_scores_are_non_negative(self, bibliography: Tuple[BibItem, ...], subjects: Tuple[BibItem, ...]) -> None:
+        """Rust scorer should produce non-negative scores."""
         index = build_index(bibliography)
+        results = stage_bibitems_batch(subjects, index, top_n=3)
 
-        rust_results = stage_bibitems_batch(subjects, index, top_n=3, use_rust=True)
-        python_results = stage_bibitems_batch(subjects, index, top_n=3, use_rust=False)
-
-        for rust_staged in rust_results:
-            for match in rust_staged.top_matches:
+        for staged in results:
+            for match in staged.top_matches:
                 assert match.total_score >= 0
 
-        for python_staged in python_results:
-            for match in python_staged.top_matches:
-                assert match.total_score >= 0
-
-    def test_custom_weights_both_paths(self, bibliography: Tuple[BibItem, ...], subjects: Tuple[BibItem, ...]) -> None:
-        """Custom weights should work for both Rust and Python paths."""
+    def test_custom_weights_work(self, bibliography: Tuple[BibItem, ...], subjects: Tuple[BibItem, ...]) -> None:
+        """Custom weights should work with Rust scorer."""
         index = build_index(bibliography)
         weights: FuzzyMatchWeights = {"title": 0.7, "author": 0.1, "date": 0.1, "bonus": 0.1}
-
-        rust_results = stage_bibitems_batch(subjects, index, top_n=2, use_rust=True, weights=weights)
-        python_results = stage_bibitems_batch(subjects, index, top_n=2, use_rust=False, weights=weights)
-
-        assert len(rust_results) == len(python_results)
-        # Both should still agree on best match
-        for rust_staged, python_staged in zip(rust_results, python_results):
-            if rust_staged.top_matches and python_staged.top_matches:
-                assert rust_staged.top_matches[0].bibkey == python_staged.top_matches[0].bibkey
+        results = stage_bibitems_batch(subjects, index, top_n=2, weights=weights)
+        assert len(results) == len(subjects)
 
     def test_rust_scorer_metadata(self, bibliography: Tuple[BibItem, ...], subjects: Tuple[BibItem, ...]) -> None:
         """Rust scorer should report 'rust' in metadata."""
         index = build_index(bibliography)
-        rust_results = stage_bibitems_batch(subjects, index, top_n=2, use_rust=True)
+        results = stage_bibitems_batch(subjects, index, top_n=2)
 
-        for staged in rust_results:
+        for staged in results:
             assert staged.search_metadata.get("scorer") == "rust"

@@ -3,8 +3,7 @@
 This module provides efficient fuzzy matching against large bibliographies (100k+ items)
 by using multi-index blocking to reduce the search space before applying detailed scoring.
 
-When available, uses a Rust-based batch scorer (rust_scorer) for parallel processing,
-providing 10-100x speedup on large batches.
+Uses a Rust-based batch scorer for parallel processing, providing 10-100x speedup.
 """
 
 import pickle
@@ -14,11 +13,9 @@ from pathlib import Path
 from typing import TYPE_CHECKING, DefaultDict, FrozenSet, Iterator, Sequence, Tuple
 
 from aletk.utils import remove_extra_whitespace
-from cytoolz import topk
 
 from philoch_bib_sdk.converters.plaintext.bibitem.bibkey_formatter import format_bibkey
-from philoch_bib_enhancer.fuzzy_matching.comparator import compare_bibitems_detailed
-from philoch_bib_sdk.logic.models import BibItem, BibItemDateAttr, TBibString
+from philoch_bib_sdk.logic.models import BibItem, BibItemDateAttr
 from philoch_bib_enhancer.fuzzy_matching.models import (
     DEFAULT_FUZZY_MATCH_WEIGHTS,
     BibItemStaged,
@@ -542,163 +539,53 @@ def _get_candidate_set(subject: BibItem, index: BibItemBlockIndex) -> FrozenSet[
     return frozenset(candidates)
 
 
-def find_similar_bibitems(
-    subject: BibItem,
-    index: BibItemBlockIndex,
-    top_n: int = 5,
-    min_score: float = 0.0,
-    bibstring_type: TBibString = "simplified",
-    weights: FuzzyMatchWeights | None = None,
-) -> Tuple[Match, ...]:
-    """Find top N most similar BibItems using fuzzy matching.
-
-    Uses blocking indexes to reduce search space, then applies detailed
-    fuzzy scoring to find the best matches.
-
-    Args:
-        subject: BibItem to find matches for
-        index: Pre-built BibItemBlockIndex
-        top_n: Number of top matches to return (default: 5)
-        min_score: Minimum score threshold (default: 0.0)
-        bibstring_type: Which bibstring variant to use (default: "simplified")
-        weights: Weights for scoring components (default: title=0.5, author=0.3, date=0.1, bonus=0.1)
-
-    Returns:
-        Tuple of Match objects with detailed scoring, sorted by score (best first)
-    """
-    # Get candidate set from indexes
-    candidates = _get_candidate_set(subject, index)
-
-    # Score all candidates (generator for memory efficiency)
-    scored_items = (
-        (
-            candidate,
-            compare_bibitems_detailed(candidate, subject, bibstring_type, weights=weights),
-        )
-        for candidate in candidates
-    )
-
-    # Calculate total scores
-    with_totals = (
-        (candidate, partial_scores, sum(ps.weighted_score for ps in partial_scores))
-        for candidate, partial_scores in scored_items
-    )
-
-    # Filter by minimum score
-    filtered = (
-        (candidate, partial_scores, total_score)
-        for candidate, partial_scores, total_score in with_totals
-        if total_score >= min_score
-    )
-
-    # Get top N using cytoolz (heap-based, efficient)
-    top_results = tuple(topk(top_n, filtered, key=lambda x: x[2]))
-
-    # Convert to Match objects
-    return tuple(
-        Match(
-            bibkey=format_bibkey(candidate.bibkey),
-            matched_bibitem=candidate,
-            total_score=total_score,
-            partial_scores=partial_scores,
-            rank=rank,
-        )
-        for rank, (candidate, partial_scores, total_score) in enumerate(top_results, start=1)
-    )
-
-
-def stage_bibitem(
-    bibitem: BibItem,
-    index: BibItemBlockIndex,
-    top_n: int = 5,
-    min_score: float = 0.0,
-    weights: FuzzyMatchWeights | None = None,
-) -> BibItemStaged:
-    """Stage a single BibItem with its top matches.
-
-    Args:
-        bibitem: BibItem to stage
-        index: Pre-built BibItemBlockIndex
-        top_n: Number of top matches to find (default: 5)
-        min_score: Minimum score threshold (default: 0.0)
-        weights: Weights for scoring components (default: title=0.5, author=0.3, date=0.1, bonus=0.1)
-
-    Returns:
-        BibItemStaged with top matches and search metadata
-    """
-    start_time = time.perf_counter()
-    candidates = _get_candidate_set(bibitem, index)
-    top_matches = find_similar_bibitems(bibitem, index, top_n, min_score, weights=weights)
-    end_time = time.perf_counter()
-
-    search_metadata: SearchMetadata = {
-        "search_time_ms": int((end_time - start_time) * 1000),
-        "candidates_searched": len(candidates),
-    }
-
-    return BibItemStaged(
-        bibitem=bibitem,
-        top_matches=top_matches,
-        search_metadata=search_metadata,
-    )
-
-
 def stage_bibitems_batch(
     bibitems: Sequence[BibItem],
     index: BibItemBlockIndex,
     top_n: int = 5,
     min_score: float = 0.0,
-    use_rust: bool | None = None,
     weights: FuzzyMatchWeights | None = None,
 ) -> Tuple[BibItemStaged, ...]:
-    """Stage multiple BibItems in batch.
+    """Stage multiple BibItems in batch using Rust parallel scorer.
 
-    When Rust scorer is available, processes all items in parallel for
-    significant speedup (10-100x on large batches).
+    Processes all items in parallel for significant speedup (10-100x on large batches).
 
     Args:
         bibitems: Sequence of BibItems to stage
         index: Pre-built BibItemBlockIndex
         top_n: Number of top matches per item (default: 5)
         min_score: Minimum score threshold (default: 0.0)
-        use_rust: Force Rust (True), Python (False), or auto-detect (None)
-        weights: Weights for scoring components (default: title=0.5, author=0.3, date=0.1, bonus=0.1)
+        weights: Weights for scoring components (default: title=0.4, author=0.3, date=0.05, bonus=0.25)
 
     Returns:
         Tuple of BibItemStaged objects
+
+    Raises:
+        RuntimeError: If Rust scorer is not available
     """
-    # Determine whether to use Rust
-    if use_rust is None:
-        use_rust = _RUST_SCORER_AVAILABLE
+    if not _RUST_SCORER_AVAILABLE:
+        raise RuntimeError("Rust scorer not available. Rebuild with: maturin develop --release")
 
-    if use_rust and not _RUST_SCORER_AVAILABLE:
-        raise RuntimeError("Rust scorer requested but not available")
+    start_time = time.perf_counter()
+    all_matches = _find_similar_batch_rust(bibitems, index.all_items, top_n, min_score, weights=weights)
+    end_time = time.perf_counter()
 
-    if use_rust:
-        # Fast path: Rust batch scorer
-        start_time = time.perf_counter()
-        all_matches = _find_similar_batch_rust(bibitems, index.all_items, top_n, min_score, weights=weights)
-        end_time = time.perf_counter()
+    # Create BibItemStaged objects
+    total_time_ms = int((end_time - start_time) * 1000)
+    time_per_item = total_time_ms // len(bibitems) if bibitems else 0
 
-        # Create BibItemStaged objects
-        total_time_ms = int((end_time - start_time) * 1000)
-        time_per_item = total_time_ms // len(bibitems) if bibitems else 0
-
-        return tuple(
-            BibItemStaged(
-                bibitem=bibitem,
-                top_matches=matches,
-                search_metadata={
-                    "search_time_ms": time_per_item,
-                    "candidates_searched": len(index.all_items),
-                    "scorer": "rust",
-                },
-            )
-            for bibitem, matches in zip(bibitems, all_matches)
+    return tuple(
+        BibItemStaged(
+            bibitem=bibitem,
+            top_matches=matches,
+            search_metadata={
+                "search_time_ms": time_per_item,
+                "candidates_searched": len(index.all_items),
+                "scorer": "rust",
+            },
         )
-    else:
-        # Fallback: Python sequential processing
-        return tuple(stage_bibitem(bibitem, index, top_n, min_score, weights=weights) for bibitem in bibitems)
+        for bibitem, matches in zip(bibitems, all_matches)
+    )
 
 
 def stage_bibitems_streaming(
@@ -707,10 +594,11 @@ def stage_bibitems_streaming(
     top_n: int = 5,
     min_score: float = 0.0,
     weights: FuzzyMatchWeights | None = None,
+    batch_size: int = 100,
 ) -> Iterator[BibItemStaged]:
     """Stage multiple BibItems with streaming results.
 
-    Yields BibItemStaged objects one at a time as they're processed,
+    Yields BibItemStaged objects as they're processed in batches,
     enabling real-time progress monitoring and immediate CSV output.
 
     Args:
@@ -718,13 +606,20 @@ def stage_bibitems_streaming(
         index: Pre-built BibItemBlockIndex
         top_n: Number of top matches per item (default: 5)
         min_score: Minimum score threshold (default: 0.0)
-        weights: Weights for scoring components (default: title=0.5, author=0.3, date=0.1, bonus=0.1)
+        weights: Weights for scoring components (default: title=0.4, author=0.3, date=0.05, bonus=0.25)
+        batch_size: Number of items to process per batch (default: 100)
 
     Yields:
         BibItemStaged objects as they're processed
     """
-    for bibitem in bibitems:
-        yield stage_bibitem(bibitem, index, top_n, min_score, weights=weights)
+    # Convert to list for slicing
+    items_list = list(bibitems)
+
+    # Process in batches and yield individual results
+    for i in range(0, len(items_list), batch_size):
+        batch = items_list[i : i + batch_size]
+        batch_results = stage_bibitems_batch(batch, index, top_n, min_score, weights=weights)
+        yield from batch_results
 
 
 # --- Index Caching ---

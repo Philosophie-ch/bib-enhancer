@@ -39,6 +39,18 @@ Score statistics by annotation type:
 - WRONG_KEY: median=120.22, min=86.19, max=176.00
 - NOT_IN_BIBLIO: median=105.24, min=41.52, max=186.00
 
+METRICS GLOSSARY
+----------------
+- P@1 (Precision@1): Percentage of queries where the correct answer is ranked #1.
+  This is the key metric — if users trust the first result, it must be right.
+
+- R@5 (Recall@5): Percentage of queries where the correct answer appears in top 5.
+  Even if rank 1 is wrong, a human reviewer can quickly scan 5 options.
+
+- MRR (Mean Reciprocal Rank): Average of 1/rank for each query.
+  - Rank 1 → 1.0, Rank 2 → 0.5, Rank 3 → 0.33, Not found → 0
+  - MRR of 0.97 means correct answer is almost always at rank 1.
+
 To re-run: pytest -m slow tests/fuzzy_matching/test_benchmark.py -v -s
 ================================================================================
 """
@@ -207,7 +219,6 @@ def run_benchmark(
     index: BibItemBlockIndex,
     weights: FuzzyMatchWeights | None = None,
     top_n: int = 5,
-    use_rust: bool = True,
 ) -> list[BenchmarkResult]:
     """Run fuzzy matching on all ground truth cases.
 
@@ -216,7 +227,6 @@ def run_benchmark(
         index: Pre-built bibliography index
         weights: Weight configuration (None for defaults)
         top_n: Number of matches to retrieve per subject
-        use_rust: Use Rust batch scorer for speed (default True)
 
     Returns:
         List of benchmark results with match info
@@ -231,12 +241,11 @@ def run_benchmark(
             subjects.append(subject)
             case_indices.append(i)
 
-    # Run batch matching (uses Rust if available and use_rust=True)
+    # Run batch matching with Rust scorer
     staged_results = stage_bibitems_batch(
         tuple(subjects),
         index,
         top_n=top_n,
-        use_rust=use_rust,
         weights=weights,
     )
 
