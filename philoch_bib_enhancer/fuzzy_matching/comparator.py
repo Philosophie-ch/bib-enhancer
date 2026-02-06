@@ -15,6 +15,36 @@ from philoch_bib_enhancer.fuzzy_matching.models import (
 logger = get_logger(__name__)
 
 
+# Academic review/response prefixes - used as a gate in fuzzy matching.
+# If one title starts with a prefix and the other doesn't, they cannot match.
+ACADEMIC_REVIEW_PREFIXES = (
+    "reply to",
+    "comments on",
+    "précis of",
+    "precis of",
+    "review of",
+    "critical notice",
+    "symposium on",
+    "discussion of",
+    "response to",
+    "a reply to",
+    "responses to",
+)
+
+
+def _has_academic_prefix(title: str) -> bool:
+    """Check if a title starts with an academic review/response prefix.
+
+    Args:
+        title: Title string to check (will be lowercased)
+
+    Returns:
+        True if title starts with any of the academic prefixes
+    """
+    normalized = title.lower().strip()
+    return any(normalized.startswith(prefix) for prefix in ACADEMIC_REVIEW_PREFIXES)
+
+
 class BibItemScore(TypedDict):
     score: int
     score_title: int
@@ -286,10 +316,13 @@ def _score_date_detailed(
             details=f"Exact year match: {year_1}",
         )
 
-    # Flexible matching (±3 years for reprints/editions)
+    # Flexible matching with wider tolerance for CrossRef date discrepancies
+    # (online-early vs issue date can differ by several years)
     year_diff = abs(year_1 - year_2)
-    if year_diff <= 3:
-        score = 100 - (year_diff * 10)  # 90, 80, 70 for 1, 2, 3 year diff
+    if year_diff <= 5:
+        # Scoring curve: ±1=95, ±2=90, ±3=85, ±4=75, ±5=65
+        score_map = {1: 95, 2: 90, 3: 85, 4: 75, 5: 65}
+        score = score_map[year_diff]
         return PartialScore(
             component=ScoreComponent.DATE,
             score=score,
@@ -302,9 +335,9 @@ def _score_date_detailed(
     if year_1 // 10 == year_2 // 10:
         return PartialScore(
             component=ScoreComponent.DATE,
-            score=30,
+            score=40,
             weight=weight,
-            weighted_score=30.0 * weight,
+            weighted_score=40.0 * weight,
             details=f"Same decade: {year_1} vs {year_2}",
         )
 
@@ -374,6 +407,18 @@ def _score_bonus_fields(reference: BibItem, subject: BibItem, weight: float = 0.
     )
 
 
+def _make_zero_partial_scores(
+    weight_title: float, weight_author: float, weight_date: float, weight_bonus: float, reason: str
+) -> Tuple[PartialScore, ...]:
+    """Create a tuple of all-zero partial scores (used when gating rejects a match)."""
+    return (
+        PartialScore(component=ScoreComponent.TITLE, score=0, weight=weight_title, weighted_score=0.0, details=reason),
+        PartialScore(component=ScoreComponent.AUTHOR, score=0, weight=weight_author, weighted_score=0.0, details=reason),
+        PartialScore(component=ScoreComponent.DATE, score=0, weight=weight_date, weighted_score=0.0, details=reason),
+        PartialScore(component=ScoreComponent.PUBLISHER, score=0, weight=weight_bonus, weighted_score=0.0, details=reason),
+    )
+
+
 def compare_bibitems_detailed(
     reference: BibItem,
     subject: BibItem,
@@ -404,6 +449,17 @@ def compare_bibitems_detailed(
         title_2 = getattr(subject.title, bibstring_type)
     else:
         title_2 = ""
+
+    # Academic prefix gate: if one title has an academic review prefix and the other
+    # doesn't, they cannot be the same work (e.g., "X" can't match "Reply to X")
+    subject_has_prefix = _has_academic_prefix(title_1)
+    reference_has_prefix = _has_academic_prefix(title_2)
+    if subject_has_prefix != reference_has_prefix:
+        # One has prefix, other doesn't - automatic non-match
+        return _make_zero_partial_scores(
+            weight_title, weight_author, weight_date, weight_bonus,
+            "Academic prefix mismatch (one is a review/reply, other is not)"
+        )
 
     title_partial = _score_title_detailed(title_1, title_2, weight_title)
 

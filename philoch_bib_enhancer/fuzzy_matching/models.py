@@ -29,11 +29,13 @@ class FuzzyMatchWeights(TypedDict):
     bonus: float
 
 
+# Tuned on PhilStudies benchmark (2026-02-06): 95.49% P@1, 98.98% R@5, 0.9711 MRR
+# See tests/fuzzy_matching/test_benchmark.py for full results and reasoning
 DEFAULT_FUZZY_MATCH_WEIGHTS: FuzzyMatchWeights = {
-    "title": 0.5,
+    "title": 0.4,
     "author": 0.3,
-    "date": 0.1,
-    "bonus": 0.1,
+    "date": 0.05,
+    "bonus": 0.25,
 }
 
 

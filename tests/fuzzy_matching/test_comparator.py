@@ -195,25 +195,37 @@ class TestScoreDateDetailed:
         date1 = BibItemDateAttr(year=2024)
         date2 = BibItemDateAttr(year=2025)
         result = _score_date_detailed(date1, date2)
-        assert result.score == 90
+        assert result.score == 95  # wider tolerance for CrossRef date discrepancies
 
     def test_two_year_diff(self) -> None:
         date1 = BibItemDateAttr(year=2024)
         date2 = BibItemDateAttr(year=2022)
         result = _score_date_detailed(date1, date2)
-        assert result.score == 80
+        assert result.score == 90
 
     def test_three_year_diff(self) -> None:
         date1 = BibItemDateAttr(year=2024)
         date2 = BibItemDateAttr(year=2021)
         result = _score_date_detailed(date1, date2)
-        assert result.score == 70
+        assert result.score == 85
+
+    def test_four_year_diff(self) -> None:
+        date1 = BibItemDateAttr(year=2024)
+        date2 = BibItemDateAttr(year=2020)
+        result = _score_date_detailed(date1, date2)
+        assert result.score == 75
+
+    def test_five_year_diff(self) -> None:
+        date1 = BibItemDateAttr(year=2024)
+        date2 = BibItemDateAttr(year=2019)
+        result = _score_date_detailed(date1, date2)
+        assert result.score == 65
 
     def test_same_decade(self) -> None:
         date1 = BibItemDateAttr(year=2020)
-        date2 = BibItemDateAttr(year=2025)
+        date2 = BibItemDateAttr(year=2028)
         result = _score_date_detailed(date1, date2)
-        assert result.score == 30
+        assert result.score == 40
         assert "decade" in result.details.lower()
 
     def test_different_decades(self) -> None:
@@ -332,11 +344,12 @@ class TestCompareBibitemsDetailed:
         assert result[3].component == ScoreComponent.PUBLISHER  # bonus uses PUBLISHER
 
     def test_default_weights_applied(self, bib_smith_philosophy: BibItem, subject_close_match: BibItem) -> None:
+        """Test that tuned default weights are applied (optimized for PhilStudies benchmark)."""
         result = compare_bibitems_detailed(bib_smith_philosophy, subject_close_match)
-        assert result[0].weight == 0.5  # title
+        assert result[0].weight == 0.4  # title (reduced from 0.5 - generic titles)
         assert result[1].weight == 0.3  # author
-        assert result[2].weight == 0.1  # date
-        assert result[3].weight == 0.1  # bonus
+        assert result[2].weight == 0.05  # date (reduced from 0.1 - CrossRef discrepancies)
+        assert result[3].weight == 0.25  # bonus (increased from 0.1 - DOI reliable)
 
     def test_custom_weights_applied(self, bib_smith_philosophy: BibItem, subject_close_match: BibItem) -> None:
         custom_weights: FuzzyMatchWeights = {
@@ -412,3 +425,101 @@ class TestWeightsBehavior:
         total_author_strong = sum(ps.weighted_score for ps in scores_author_strong)
 
         assert total_author_strong > total_title_strong
+
+
+# ============================================================================
+# Academic prefix gate tests
+# ============================================================================
+
+
+class TestAcademicPrefixGate:
+    """Tests for the academic review/response prefix gate.
+
+    The gate ensures that items like "Reply to X" cannot match "X" -
+    one is a response to the other, not the same work.
+    """
+
+    def test_has_academic_prefix_reply_to(self) -> None:
+        from philoch_bib_enhancer.fuzzy_matching.comparator import _has_academic_prefix
+
+        assert _has_academic_prefix("Reply to Smith on Knowledge")
+        assert _has_academic_prefix("reply to smith")  # case insensitive
+
+    def test_has_academic_prefix_various_prefixes(self) -> None:
+        from philoch_bib_enhancer.fuzzy_matching.comparator import _has_academic_prefix
+
+        assert _has_academic_prefix("Comments on Smith's paper")
+        assert _has_academic_prefix("Précis of my book")
+        assert _has_academic_prefix("Review of Recent Philosophy")
+        assert _has_academic_prefix("Critical Notice: A New Theory")
+        assert _has_academic_prefix("Discussion of Davidson's Work")
+        assert _has_academic_prefix("Response to critics")
+
+    def test_has_academic_prefix_no_prefix(self) -> None:
+        from philoch_bib_enhancer.fuzzy_matching.comparator import _has_academic_prefix
+
+        assert not _has_academic_prefix("On the Nature of Knowledge")
+        assert not _has_academic_prefix("Knowledge and Belief")
+        assert not _has_academic_prefix("")
+
+    def test_prefix_mismatch_yields_zero_scores(self) -> None:
+        """If one title has prefix and other doesn't, all scores should be zero."""
+        from philoch_bib_sdk.logic.default_models import default_bib_item
+
+        original = default_bib_item(
+            bibkey={"first_author": "Smith", "date": 2020},
+            title={"simplified": "On Knowledge"},
+            entry_type="article",
+        )
+        reply = default_bib_item(
+            bibkey={"first_author": "Jones", "date": 2021},
+            title={"simplified": "Reply to Smith on Knowledge"},
+            entry_type="article",
+        )
+
+        result = compare_bibitems_detailed(original, reply)
+        total = sum(ps.weighted_score for ps in result)
+
+        assert total == 0.0
+        assert "prefix mismatch" in result[0].details.lower()
+
+    def test_both_have_prefix_normal_scoring(self) -> None:
+        """If both titles have prefixes, normal scoring applies."""
+        from philoch_bib_sdk.logic.default_models import default_bib_item
+
+        reply1 = default_bib_item(
+            bibkey={"first_author": "Jones", "date": 2021},
+            title={"simplified": "Reply to Smith on Knowledge"},
+            entry_type="article",
+        )
+        reply2 = default_bib_item(
+            bibkey={"first_author": "Jones", "date": 2021},
+            title={"simplified": "Reply to Smith on Knowledge"},  # identical
+            entry_type="article",
+        )
+
+        result = compare_bibitems_detailed(reply1, reply2)
+        total = sum(ps.weighted_score for ps in result)
+
+        # Should have positive score since both are replies
+        assert total > 0
+
+    def test_neither_has_prefix_normal_scoring(self) -> None:
+        """If neither title has prefix, normal scoring applies."""
+        from philoch_bib_sdk.logic.default_models import default_bib_item
+
+        item1 = default_bib_item(
+            bibkey={"first_author": "Smith", "date": 2020},
+            title={"simplified": "On Knowledge"},
+            entry_type="article",
+        )
+        item2 = default_bib_item(
+            bibkey={"first_author": "Smith", "date": 2020},
+            title={"simplified": "On Knowledge"},
+            entry_type="article",
+        )
+
+        result = compare_bibitems_detailed(item1, item2)
+        total = sum(ps.weighted_score for ps in result)
+
+        assert total > 0
