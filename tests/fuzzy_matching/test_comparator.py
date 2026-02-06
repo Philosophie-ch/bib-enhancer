@@ -344,12 +344,12 @@ class TestCompareBibitemsDetailed:
         assert result[3].component == ScoreComponent.PUBLISHER  # bonus uses PUBLISHER
 
     def test_default_weights_applied(self, bib_smith_philosophy: BibItem, subject_close_match: BibItem) -> None:
-        """Test that tuned default weights are applied (optimized for PhilStudies benchmark)."""
+        """Test that tuned default weights are applied (optimized via grid search)."""
         result = compare_bibitems_detailed(bib_smith_philosophy, subject_close_match)
-        assert result[0].weight == 0.4  # title (reduced from 0.5 - generic titles)
-        assert result[1].weight == 0.3  # author
-        assert result[2].weight == 0.05  # date (reduced from 0.1 - CrossRef discrepancies)
-        assert result[3].weight == 0.25  # bonus (increased from 0.1 - DOI reliable)
+        assert result[0].weight == 0.25  # title (lower - prefix gate handles edge cases)
+        assert result[1].weight == 0.25  # author (lower - initials matching helps)
+        assert result[2].weight == 0.2  # date (higher - wider tolerance makes it reliable)
+        assert result[3].weight == 0.3  # bonus (highest - DOI very reliable)
 
     def test_custom_weights_applied(self, bib_smith_philosophy: BibItem, subject_close_match: BibItem) -> None:
         custom_weights: FuzzyMatchWeights = {

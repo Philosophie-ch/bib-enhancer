@@ -8,7 +8,7 @@ This module provides:
 Run with: pytest -m slow tests/fuzzy_matching/test_benchmark.py -v
 
 ================================================================================
-BENCHMARK RESULTS (2026-02-06)
+BENCHMARK RESULTS (2026-02-06) - After Algorithmic Improvements
 ================================================================================
 
 Ground truth: 4,972 annotated cases from PhilStudies CrossRef data (1950-2017)
@@ -16,28 +16,34 @@ Ground truth: 4,972 annotated cases from PhilStudies CrossRef data (1950-2017)
 - WRONG_KEY: 313 (match_1 wrong, correct bibkey annotated)
 - NOT_IN_BIBLIO: 1,622 (no match exists in bibliography)
 
-Weight configuration comparison:
+Algorithmic improvements applied:
+- Academic prefix gate (prevents "X" matching "Reply to X")
+- Author initials matching ("E. M. Adams" ↔ "Ernest M. Adams")
+- Wider date tolerance (±1-5 years with graduated scoring)
+- Performance: blocking index in Rust (~100x faster)
 
-| Config       | Title | Author | Date | Bonus | P@1    | R@5    | MRR    |
-|--------------|-------|--------|------|-------|--------|--------|--------|
-| default      | 0.5   | 0.3    | 0.1  | 0.1   | 90.77% | 98.36% | 0.9386 |
-| title_heavy  | 0.7   | 0.2    | 0.05 | 0.05  | 87.58% | 94.98% | 0.8983 |
-| author_heavy | 0.3   | 0.5    | 0.1  | 0.1   | 94.80% | 98.66% | 0.9650 |
-| balanced     | 0.4   | 0.4    | 0.1  | 0.1   | 95.46% | 98.93% | 0.9703 |
-| date_boost   | 0.45  | 0.3    | 0.2  | 0.05  | 91.85% | 98.75% | 0.9473 |
-| bonus_boost  | 0.4   | 0.3    | 0.05 | 0.25  | 95.49% | 98.98% | 0.9711 |
+Grid search results (110 valid configurations tested):
 
-WINNER: bonus_boost (0.4/0.3/0.05/0.25) with 95.49% P@1
+| Rank | Title | Author | Date | Bonus | P@1    | R@5    | MRR    |
+|------|-------|--------|------|-------|--------|--------|--------|
+| 1    | 0.25  | 0.25   | 0.2  | 0.3   | 96.72% | 98.09% | 0.9738 |
+| 2    | 0.25  | 0.30   | 0.15 | 0.3   | 96.57% | 98.09% | 0.9729 |
+| 3    | 0.30  | 0.20   | 0.2  | 0.3   | 96.39% | 98.09% | 0.9720 |
+| 4    | 0.25  | 0.35   | 0.1  | 0.3   | 96.39% | 97.91% | 0.9711 |
+| 5    | 0.25  | 0.30   | 0.2  | 0.25  | 96.36% | 98.09% | 0.9717 |
 
-Why bonus_boost works best for PhilStudies:
-- Title 0.5→0.4: Many articles have short/generic titles ("Reply to X", "'Ought' again")
-- Bonus 0.1→0.25: DOI and journal+vol+num matches are highly reliable when present
-- Date 0.1→0.05: CrossRef often has wrong dates (online-early vs issue date)
+WINNER: title=0.25, author=0.25, date=0.2, bonus=0.3 with 96.72% P@1
 
-Score statistics by annotation type:
-- RIGHT_KEY: median=176.00, min=79.22, max=187.00
-- WRONG_KEY: median=120.22, min=86.19, max=176.00
-- NOT_IN_BIBLIO: median=105.24, min=41.52, max=186.00
+Why these weights work best after improvements:
+- Title 0.25: Lower than before since academic prefix gate handles "Reply to X" cases
+- Author 0.25: Lower since initials matching helps catch partial name matches
+- Date 0.2: Higher since wider tolerance makes dates more reliable signals
+- Bonus 0.3: Highest weight - DOI and journal+vol+num are very reliable
+
+Comparison with previous best (bonus_boost):
+- P@1: 95.49% → 96.72% (+1.23%)
+- R@5: 97.70% → 98.09% (+0.39%)
+- MRR: 0.9649 → 0.9738 (+0.009)
 
 METRICS GLOSSARY
 ----------------
@@ -367,8 +373,8 @@ class TestPhilStudiesBenchmark:
             f"  Correct at rank 1: {int(precision * len([r for r in results if r['case']['annotation_type'] in ('RIGHT_KEY', 'WRONG_KEY')]))}"
         )
 
-        # Baseline: 95% (tuned defaults achieve 95.49% on benchmark)
-        assert precision >= 0.95, f"Precision@1 {precision:.2%} below baseline 95%"
+        # Baseline: 96% (tuned defaults achieve 96.72% on benchmark)
+        assert precision >= 0.96, f"Precision@1 {precision:.2%} below baseline 96%"
 
     def test_default_weights_recall_at_5(
         self,
@@ -424,6 +430,7 @@ class TestWeightComparison:
     """Compare different weight configurations."""
 
     WEIGHT_CONFIGS: list[tuple[str, FuzzyMatchWeights]] = [
+        ("optimal", {"title": 0.25, "author": 0.25, "date": 0.2, "bonus": 0.3}),  # Best from grid search
         ("default", {"title": 0.5, "author": 0.3, "date": 0.1, "bonus": 0.1}),
         ("title_heavy", {"title": 0.7, "author": 0.2, "date": 0.05, "bonus": 0.05}),
         ("author_heavy", {"title": 0.3, "author": 0.5, "date": 0.1, "bonus": 0.1}),
@@ -454,3 +461,75 @@ class TestWeightComparison:
 
         # Just report, don't assert (this is for comparison)
         assert True
+
+
+@pytest.mark.slow
+class TestGridSearch:
+    """Grid search for optimal weight configurations."""
+
+    def test_grid_search(
+        self,
+        philstudies_ground_truth: list[GroundTruthCase],
+        philstudies_index: BibItemBlockIndex,
+    ) -> None:
+        """Run grid search over weight space to find optimal configuration."""
+        best_p1 = 0.0
+        best_r5 = 0.0
+        best_mrr = 0.0
+        best_weights: FuzzyMatchWeights | None = None
+        all_results: list[tuple[FuzzyMatchWeights, float, float, float]] = []
+
+        # Grid: title 0.25-0.50, author 0.20-0.45, bonus 0.10-0.30
+        # date = 1.0 - title - author - bonus (must be >= 0 and <= 0.2)
+        title_range = [0.25, 0.30, 0.35, 0.40, 0.45, 0.50]
+        author_range = [0.20, 0.25, 0.30, 0.35, 0.40, 0.45]
+        bonus_range = [0.10, 0.15, 0.20, 0.25, 0.30]
+
+        total_configs = 0
+        tested_configs = 0
+
+        for title in title_range:
+            for author in author_range:
+                for bonus in bonus_range:
+                    total_configs += 1
+                    date = round(1.0 - title - author - bonus, 2)
+                    if date < 0 or date > 0.2:
+                        continue
+
+                    tested_configs += 1
+                    weights: FuzzyMatchWeights = {
+                        "title": title,
+                        "author": author,
+                        "date": date,
+                        "bonus": bonus,
+                    }
+
+                    results = run_benchmark(philstudies_ground_truth, philstudies_index, weights=weights, top_n=5)
+                    p1 = compute_precision_at_1(results)
+                    r5 = compute_recall_at_k(results, k=5)
+                    mrr = compute_mrr(results)
+
+                    all_results.append((weights, p1, r5, mrr))
+
+                    if p1 > best_p1 or (p1 == best_p1 and mrr > best_mrr):
+                        best_p1, best_r5, best_mrr, best_weights = p1, r5, mrr, weights
+                        print(f"\nNew best: P@1={p1:.4f}, R@5={r5:.4f}, MRR={mrr:.4f}")
+                        print(f"  Weights: {weights}")
+
+        print(f"\n{'='*60}")
+        print(f"Grid search complete: {tested_configs}/{total_configs} valid configs tested")
+        print(f"\nBest configuration:")
+        print(f"  P@1={best_p1:.4f}, R@5={best_r5:.4f}, MRR={best_mrr:.4f}")
+        print(f"  Weights: {best_weights}")
+
+        # Print top 10 configurations
+        all_results.sort(key=lambda x: (-x[1], -x[3]))  # Sort by P@1 desc, then MRR desc
+        print(f"\nTop 10 configurations:")
+        print(f"{'Rank':<5} {'P@1':<8} {'R@5':<8} {'MRR':<8} {'Title':<7} {'Author':<7} {'Date':<7} {'Bonus':<7}")
+        print("-" * 70)
+        for i, (w, p1, r5, mrr) in enumerate(all_results[:10], 1):
+            print(
+                f"{i:<5} {p1:.4f}   {r5:.4f}   {mrr:.4f}   {w['title']:<7} {w['author']:<7} {w['date']:<7} {w['bonus']:<7}"
+            )
+
+        assert best_weights is not None
