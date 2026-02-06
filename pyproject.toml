@@ -65,9 +65,10 @@ plugins = ["pydantic.mypy"]
 
 [tool.pytest.ini_options]
 minversion = "6.0"
-addopts = "-ras -m 'not external'"
+addopts = "-ras -m 'not external and not slow'"
 markers = [
     "external: mark tests that require external API calls",
+    "slow: mark tests as slow (deselected by default)",
 ]
 testpaths = ["tests"]
 pythonpath = ["."]
