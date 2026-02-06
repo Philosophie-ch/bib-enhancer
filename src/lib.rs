@@ -150,6 +150,31 @@ fn build_index_rust(py: Python, items_data: Vec<ItemData>) -> PyResult<IndexData
 
 // === SCORER FUNCTIONALITY (merged from rust_scorer) ===
 
+/// Academic review/response prefixes - used as a gate in fuzzy matching.
+/// If one title starts with a prefix and the other doesn't, they cannot match.
+const ACADEMIC_REVIEW_PREFIXES: &[&str] = &[
+    "reply to",
+    "comments on",
+    "précis of",
+    "precis of",
+    "review of",
+    "critical notice",
+    "symposium on",
+    "discussion of",
+    "response to",
+    "a reply to",
+    "responses to",
+];
+
+/// Check if a title starts with an academic review/response prefix
+fn has_academic_prefix(title: &str) -> bool {
+    let normalized = title.to_lowercase();
+    let trimmed = normalized.trim();
+    ACADEMIC_REVIEW_PREFIXES
+        .iter()
+        .any(|prefix| trimmed.starts_with(prefix))
+}
+
 /// Normalize text: lowercase and collapse whitespace
 fn normalize(s: &str) -> String {
     s.to_lowercase()
@@ -274,6 +299,91 @@ fn score_title(title1: &str, title2: &str, weight: f64) -> f64 {
     final_score.max(0.0) * weight
 }
 
+/// Check if a name part is an initial (e.g., "E." or "E")
+fn is_initial(name: &str) -> bool {
+    let cleaned = name.trim_end_matches('.');
+    cleaned.len() == 1 && cleaned.chars().next().map_or(false, |c| c.is_alphabetic())
+}
+
+/// Get the uppercase initial letter from a name part
+fn get_initial_letter(name: &str) -> Option<char> {
+    name.trim_end_matches('.')
+        .chars()
+        .next()
+        .map(|c| c.to_ascii_uppercase())
+}
+
+/// Extract given name parts and surname from an author string
+/// Returns (given_names, surname)
+fn extract_name_parts(author: &str) -> (Vec<&str>, &str) {
+    let parts: Vec<&str> = author.split_whitespace().collect();
+    if parts.len() < 2 {
+        return (vec![], parts.first().copied().unwrap_or(""));
+    }
+    // Assume last part is surname, rest are given names
+    let surname = parts.last().unwrap();
+    let given = parts[..parts.len() - 1].to_vec();
+    (given, surname)
+}
+
+/// Check if one author string uses initials that match the other's full names.
+/// Handles cases like "E. M. Adams" vs "Ernest M. Adams" or "J. Smith" vs "John Smith".
+fn check_initials_match(author1: &str, author2: &str) -> bool {
+    let (given1, surname1) = extract_name_parts(author1);
+    let (given2, surname2) = extract_name_parts(author2);
+
+    // Quick surname check - must start with same letter
+    let s1_initial = get_initial_letter(surname1);
+    let s2_initial = get_initial_letter(surname2);
+    if s1_initial != s2_initial {
+        return false;
+    }
+
+    // Fuzzy surname check (only call once, not in loop)
+    let surname_score = token_sort_ratio_f64(
+        &surname1.to_lowercase(),
+        &surname2.to_lowercase(),
+    );
+    if surname_score < 80.0 {
+        return false;
+    }
+
+    // Count initials in each given name list
+    let initials_count1 = given1.iter().filter(|g| is_initial(g)).count();
+    let initials_count2 = given2.iter().filter(|g| is_initial(g)).count();
+
+    // If same number of initials (including both zero), no special handling needed
+    // We want cases where one uses more initials than the other
+    if initials_count1 == initials_count2 {
+        return false;
+    }
+
+    // Determine which has more initials (the "initial form") vs fewer (the "full form")
+    let (initial_given, full_given) = if initials_count1 > initials_count2 {
+        (&given1, &given2)
+    } else {
+        (&given2, &given1)
+    };
+
+    // Check if initials in the initial form match first letters of full form
+    let mut matches = 0;
+    for (i, name) in initial_given.iter().enumerate() {
+        if i >= full_given.len() {
+            break;
+        }
+        // Compare first letters regardless of whether it's an initial or full name
+        let letter1 = get_initial_letter(name);
+        let letter2 = get_initial_letter(full_given[i]);
+        if letter1 == letter2 {
+            matches += 1;
+        }
+    }
+
+    // Require at least one match, and allow at most one mismatch
+    let min_names = initial_given.len().min(full_given.len());
+    matches > 0 && matches >= min_names.saturating_sub(1)
+}
+
 /// Score author similarity with bonuses
 fn score_author(author1: &str, author2: &str, weight: f64) -> f64 {
     if author1.is_empty() || author2.is_empty() {
@@ -285,20 +395,30 @@ fn score_author(author1: &str, author2: &str, weight: f64) -> f64 {
 
     if raw_score > 85.0 {
         final_score += 100.0;
+    } else {
+        // Check for initial matching (e.g., "E. M. Adams" vs "Ernest M. Adams")
+        if check_initials_match(author1, author2) {
+            final_score += 50.0;
+        }
     }
 
     final_score * weight
 }
 
-/// Score date similarity
+/// Score date similarity with wider tolerance for CrossRef date discrepancies
+/// (online-early vs issue date can differ by several years)
 fn score_date(year1: Option<i32>, year2: Option<i32>, weight: f64) -> f64 {
     match (year1, year2) {
         (Some(y1), Some(y2)) => {
             let diff = y1.abs_diff(y2);
             let score = match diff {
                 0 => 100.0,
-                1..=3 => 100.0 - f64::from(diff) * 10.0,
-                _ if y1 / 10 == y2 / 10 => 30.0, // Same decade
+                1 => 95.0,
+                2 => 90.0,
+                3 => 85.0,
+                4 => 75.0,
+                5 => 65.0,
+                _ if y1 / 10 == y2 / 10 => 40.0, // Same decade
                 _ => 0.0,
             };
             score * weight
@@ -377,6 +497,20 @@ fn score_candidate(
     candidate: &BibItemData,
     weights: &Weights,
 ) -> MatchResult {
+    // Academic prefix gate: if one title has prefix and other doesn't, automatic non-match
+    let subject_has_prefix = has_academic_prefix(&subject.title);
+    let candidate_has_prefix = has_academic_prefix(&candidate.title);
+    if subject_has_prefix != candidate_has_prefix {
+        return MatchResult {
+            candidate_index: candidate.index,
+            total_score: 0.0,
+            title_score: 0.0,
+            author_score: 0.0,
+            date_score: 0.0,
+            bonus_score: 0.0,
+        };
+    }
+
     let title_score = score_title(&subject.title, &candidate.title, weights.title);
     let author_score = score_author(&subject.author, &candidate.author, weights.author);
     let date_score = score_date(subject.year, candidate.year, weights.date);
@@ -554,13 +688,74 @@ mod tests {
 
     #[test]
     fn test_score_date_close() {
+        // ±1 year = 95 (updated for wider tolerance)
         let score = score_date(Some(2020), Some(2021), 1.0);
-        assert!((score - 90.0).abs() < 0.001);
+        assert!((score - 95.0).abs() < 0.001);
+    }
+
+    #[test]
+    fn test_score_date_wider_tolerance() {
+        // ±2 = 90, ±3 = 85, ±4 = 75, ±5 = 65
+        assert!((score_date(Some(2020), Some(2022), 1.0) - 90.0).abs() < 0.001);
+        assert!((score_date(Some(2020), Some(2023), 1.0) - 85.0).abs() < 0.001);
+        assert!((score_date(Some(2020), Some(2024), 1.0) - 75.0).abs() < 0.001);
+        assert!((score_date(Some(2020), Some(2025), 1.0) - 65.0).abs() < 0.001);
     }
 
     #[test]
     fn test_score_date_same_decade() {
-        let score = score_date(Some(2020), Some(2025), 1.0);
-        assert!((score - 30.0).abs() < 0.001);
+        // > 5 years but same decade = 40
+        let score = score_date(Some(2020), Some(2028), 1.0);
+        assert!((score - 40.0).abs() < 0.001);
+    }
+
+    // Academic prefix gate tests
+    #[test]
+    fn test_has_academic_prefix() {
+        assert!(has_academic_prefix("Reply to Smith on Knowledge"));
+        assert!(has_academic_prefix("reply to smith")); // case insensitive
+        assert!(has_academic_prefix("Comments on the Paper"));
+        assert!(has_academic_prefix("Review of Recent Work"));
+        assert!(!has_academic_prefix("On the Nature of Knowledge"));
+        assert!(!has_academic_prefix("Knowledge and Belief"));
+    }
+
+    // Author initials matching tests
+    #[test]
+    fn test_is_initial() {
+        assert!(is_initial("E."));
+        assert!(is_initial("E"));
+        assert!(!is_initial("Ernest"));
+        assert!(!is_initial(""));
+    }
+
+    #[test]
+    fn test_get_initial_letter() {
+        assert_eq!(get_initial_letter("E."), Some('E'));
+        assert_eq!(get_initial_letter("Ernest"), Some('E'));
+        assert_eq!(get_initial_letter("e."), Some('E')); // uppercase
+    }
+
+    #[test]
+    fn test_check_initials_match() {
+        // "E. M. Adams" vs "Ernest M. Adams" should match
+        assert!(check_initials_match("E. M. Adams", "Ernest M. Adams"));
+        assert!(check_initials_match("J. Smith", "John Smith"));
+        // Different surnames should not match
+        assert!(!check_initials_match("E. Adams", "Ernest Jones"));
+        // Both full names should not trigger (handled by fuzzy)
+        assert!(!check_initials_match("Ernest Adams", "Ernest Adams"));
+        // Both initials should not trigger
+        assert!(!check_initials_match("E. Adams", "E. Adams"));
+    }
+
+    #[test]
+    fn test_score_author_with_initials() {
+        // With initials matching, should get +50 bonus even if fuzzy is < 85
+        let score_with_initials = score_author("E. M. Adams", "Ernest M. Adams", 1.0);
+        let score_without_match = score_author("E. M. Adams", "John Smith", 1.0);
+        assert!(score_with_initials > score_without_match);
+        // The initials bonus is +50
+        assert!(score_with_initials >= 50.0);
     }
 }
